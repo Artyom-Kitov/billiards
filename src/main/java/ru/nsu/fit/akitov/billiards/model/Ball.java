@@ -2,7 +2,7 @@ package ru.nsu.fit.akitov.billiards.model;
 
 public class Ball {
 
-  public static final float RADIUS = 34;
+  public static final float RADIUS = 30;
   private static final float COMPARE_PRECISION = 0.001f;
 
   private float x;
@@ -18,15 +18,15 @@ public class Ball {
     this.vy = 0.0f;
   }
 
-  public void move(float dt, float mu, float g) {
+  public void move(float dt, float friction, float g) {
     if (isMotionless()) {
       return;
     }
     x += vx * dt;
     y += vy * dt;
     float normV = (float) Math.sqrt(vx * vx + vy * vy);
-    vx -= vx / normV * mu * g * dt;
-    vy -= vy / normV * mu * g * dt;
+    vx -= vx / normV * friction * g * dt;
+    vy -= vy / normV * friction * g * dt;
   }
 
   public boolean isMotionless() {
@@ -55,14 +55,14 @@ public class Ball {
   }
 
   public boolean collides(Ball other) {
-    return (x - other.x) * (x - other.x) + (y - other.y) * (y - other.y) <= 4 * RADIUS * RADIUS + 4;
+    return (x - other.x) * (x - other.x) + (y - other.y) * (y - other.y) <= 4 * RADIUS * RADIUS + 2;
   }
 
   public void hit(Ball other) {
     float centralX = other.x - x;
     float centralY = other.y - y;
 
-    double norm = Math.sqrt(centralX * centralX + centralY * centralY);
+    float norm = (float) Math.sqrt(centralX * centralX + centralY * centralY);
     centralX /= norm;
     centralY /= norm;
 

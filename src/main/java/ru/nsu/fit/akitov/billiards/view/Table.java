@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Table extends JComponent {
 
-  private static final Point OFFSET = new Point(64, 46);
+  private static final Point OFFSET = new Point(60, 46);
 
   private final Image background;
   private final List<Circle> balls;

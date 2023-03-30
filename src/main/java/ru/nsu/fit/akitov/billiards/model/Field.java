@@ -26,7 +26,7 @@ public class Field {
     balls = new ArrayList<>();
     balls.add(cueBall);
     for (int i = 0; i < 9; i++) {
-      balls.add(new Ball(400 + 75 * (i % 3), 400 + 75 * (i / 3)));
+      balls.add(new Ball(400 + 67 * (i % 3), 400 + 67 * (i / 3)));
     }
 
     for (int i = 0; i < 3; i++) {
@@ -83,8 +83,8 @@ public class Field {
       for (int j = i + 1; j < balls.size(); j++) {
         if (balls.get(i).collides(balls.get(j))) {
           balls.get(i).hit(balls.get(j));
-          balls.get(i).move(dt, SURFACE_FRICTION, 10);
-          balls.get(j).move(dt, SURFACE_FRICTION, 10);
+//          balls.get(i).move(dt, SURFACE_FRICTION, 10);
+//          balls.get(j).move(dt, SURFACE_FRICTION, 10);
         }
       }
     }
