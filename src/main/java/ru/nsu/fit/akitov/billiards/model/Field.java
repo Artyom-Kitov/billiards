@@ -1,39 +1,92 @@
 package ru.nsu.fit.akitov.billiards.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Field {
-  private static final float SURFACE_FRICTION = 0.002f;
+
+  private static final float SURFACE_FRICTION = 20;
 
   private final float sizeX;
   private final float sizeY;
 
-  private Pocket[] pockets;
-  private Ball[] balls;
-  private Ball blackBall;
+  private FieldListener listener;
+
+  private final List<Pocket> pockets;
+  private final List<Ball> balls;
+  private Ball cueBall;
 
   public Field(int sizeX, int sizeY) {
     this.sizeX = sizeX;
     this.sizeY = sizeY;
 
-    pockets = new Pocket[6];
+    pockets = new ArrayList<>();
 
-    balls = new Ball[16];
-    blackBall = balls[0];
+    cueBall = new Ball(200, 200);
+    balls = new ArrayList<>();
+    balls.add(cueBall);
+    for (int i = 0; i < 9; i++) {
+      balls.add(new Ball(400 + 75 * (i % 3), 400 + 75 * (i / 3)));
+    }
+
+    for (int i = 0; i < 3; i++) {
+      pockets.add(new Pocket(i * sizeX / 2.0f, 0));
+      pockets.add(new Pocket(i * sizeX / 2.0f, sizeY));
+    }
+  }
+
+  public Ball getCueBall() {
+    return cueBall;
+  }
+
+  public void setListener(FieldListener listener) {
+    this.listener = listener;
+  }
+
+  public void reset() {
+
   }
 
   public boolean isMotionless() {
-    boolean result = true;
-    for (Ball b : balls) {
+    for (Ball ball : balls) {
+      if (!ball.isMotionless()) {
+        return false;
+      }
     }
-
-    return result;
+    return true;
   }
 
-  public void update() {
+  public List<Ball> getBalls() {
+    return balls;
+  }
+
+  public List<Pocket> getPockets() {
+    return pockets;
+  }
+
+  public void update(float dt) {
     if (isMotionless()) {
       return;
     }
 
     for (Ball ball : balls) {
+      ball.move(dt, SURFACE_FRICTION, 10);
+      if (ball.getX() - Ball.RADIUS < 0 || ball.getX() + Ball.RADIUS > sizeX) {
+        ball.setVelocity(-ball.getVelocityX(), ball.getVelocityY());
+        ball.move(dt, SURFACE_FRICTION, 10);
+      }
+      if (ball.getY() - Ball.RADIUS < 0 || ball.getY() + Ball.RADIUS > sizeY) {
+        ball.setVelocity(ball.getVelocityX(), -ball.getVelocityY());
+      }
+    }
+    for (int i = 0; i < balls.size(); i++) {
+      for (int j = i + 1; j < balls.size(); j++) {
+        if (balls.get(i).collides(balls.get(j))) {
+          balls.get(i).hit(balls.get(j));
+          balls.get(i).move(dt, SURFACE_FRICTION, 10);
+          balls.get(j).move(dt, SURFACE_FRICTION, 10);
+        }
+      }
     }
   }
 }

@@ -1,9 +1,9 @@
 package ru.nsu.fit.akitov.billiards.model;
 
 public class Ball {
-  public static final float MASS = 0.256f;
-  public static final float RADIUS = 0.068f;
-  public static final float COMPARE_PRECISION = 0.0001f;
+
+  public static final float RADIUS = 34;
+  private static final float COMPARE_PRECISION = 0.001f;
 
   private float x;
   private float y;
@@ -19,7 +19,7 @@ public class Ball {
   }
 
   public void move(float dt, float mu, float g) {
-    if (Math.abs(vx) < COMPARE_PRECISION && Math.abs(vy) < COMPARE_PRECISION) {
+    if (isMotionless()) {
       return;
     }
     x += vx * dt;
@@ -29,34 +29,56 @@ public class Ball {
     vy -= vy / normV * mu * g * dt;
   }
 
+  public boolean isMotionless() {
+    return Math.abs(vx) < COMPARE_PRECISION && Math.abs(vy) < COMPARE_PRECISION;
+  }
+
+  public float getX() {
+    return x;
+  }
+
+  public float getY() {
+    return y;
+  }
+
+  public float getVelocityX() {
+    return vx;
+  }
+
+  public float getVelocityY() {
+    return vy;
+  }
+
   public void setVelocity(float vx, float vy) {
     this.vx = vx;
     this.vy = vy;
   }
 
   public boolean collides(Ball other) {
-    return (x - other.x) * (x - other.x) + (y - other.y) * (y - other.y) <= 4 * RADIUS * RADIUS;
+    return (x - other.x) * (x - other.x) + (y - other.y) * (y - other.y) <= 4 * RADIUS * RADIUS + 4;
   }
 
   public void hit(Ball other) {
     float centralX = other.x - x;
     float centralY = other.y - y;
 
-    double sqrt = Math.sqrt(centralX * centralX + centralY * centralY);
+    double norm = Math.sqrt(centralX * centralX + centralY * centralY);
+    centralX /= norm;
+    centralY /= norm;
 
-    float coefficient1 = (vx * centralX + vy * centralY) / (float) sqrt;
+    float coefficient1 = (vx * centralX + vy * centralY);
     float thisCentralProjectionX = coefficient1 * centralX;
     float thisCentralProjectionY = coefficient1 * centralY;
 
-    float coefficient2 = (other.vx * centralX + vy * centralY) / (float) sqrt;
+    float coefficient2 = (other.vx * centralX + other.vy * centralY);
     float otherCentralProjectionX = coefficient2 * centralX;
     float otherCentralProjectionY = coefficient2 * centralY;
 
-    vx = vx - thisCentralProjectionX + otherCentralProjectionX;
-    vy = vy - thisCentralProjectionY + otherCentralProjectionY;
+    vx = (vx - thisCentralProjectionX + otherCentralProjectionX);
+    vy = (vy - thisCentralProjectionY + otherCentralProjectionY);
 
-    other.vx = other.vx - otherCentralProjectionX + thisCentralProjectionX;
-    other.vy = other.vy - otherCentralProjectionY + thisCentralProjectionY;
+    other.vx = (other.vx - otherCentralProjectionX + thisCentralProjectionX);
+    other.vy = (other.vy - otherCentralProjectionY + thisCentralProjectionY);
   }
 
   public boolean isInPocket(Pocket pocket) {

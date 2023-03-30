@@ -2,24 +2,26 @@ package ru.nsu.fit.akitov.billiards.view;
 
 import ru.nsu.fit.akitov.billiards.presenter.BilliardsPresenter;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+
+import java.util.List;
 
 public class BilliardsFrame extends JFrame implements BilliardsView {
+
   private static final String NAME = "Billiards";
   private static final String MENU = "Menu";
   private static final String NEW_GAME = "New game";
   private static final String HIGH_SCORES = "High scores";
   private static final String EXIT = "Exit";
 
-  private Table table;
+  private final Timer timer;
+
+  private final Table table;
 
   private BilliardsPresenter presenter;
 
@@ -32,17 +34,25 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
 
     table = new Table("src/main/images/table.png");
     add(table);
-    table.addCircle(new Circle(70, 64, 46, Color.black));
+
+    timer = new Timer(2, new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        presenter.updateAll(timer.getDelay() * 0.001f);
+      }
+    });
+    timer.restart();
 
     addKeyListener(new KeyListener() {
       @Override
       public void keyTyped(KeyEvent e) {
-        cueStrike();
       }
 
       @Override
       public void keyPressed(KeyEvent e) {
-
+        if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+          presenter.cueStrike(2000.0f, 2000.0f);
+        }
       }
 
       @Override
@@ -52,13 +62,29 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
     });
   }
 
-  private void cueStrike() {
-    Circle circle = new Circle(70, 900, 500, Color.white);
-    table.addCircle(circle);
-  }
-
   @Override
   public void attachPresenter(BilliardsPresenter presenter) {
     this.presenter = presenter;
+  }
+
+  @Override
+  public void addCueBall(Point center, int radius) {
+    table.addBall(new Circle(radius, center.x, center.y, Color.darkGray));
+  }
+
+  @Override
+  public void addBall(Point center, int radius) {
+    table.addBall(new Circle(radius, center.x, center.y, Color.white));
+  }
+
+  @Override
+  public void addPocket(Point center, int radius) {
+    table.addPocket(new Circle(radius, center.x, center.y, Color.black));
+  }
+
+  @Override
+  public void updateBalls(List<Point> balls) {
+    table.updateBalls(balls);
+    repaint();
   }
 }

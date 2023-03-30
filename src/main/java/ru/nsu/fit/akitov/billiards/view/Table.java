@@ -1,33 +1,51 @@
 package ru.nsu.fit.akitov.billiards.view;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Table extends JComponent {
+
+  private static final Point OFFSET = new Point(64, 46);
+
   private final Image background;
-  private final List<Circle> circles;
+  private final List<Circle> balls;
+  private final List<Circle> pockets;
 
   public Table(String path) {
+    setLayout(null);
     background = Toolkit.getDefaultToolkit().getImage(path);
-    circles = new ArrayList<>();
+    balls = new ArrayList<>();
+    pockets = new ArrayList<>();
     setVisible(true);
   }
 
-  public void addCircle(Circle circle) {
-    circles.add(circle);
+  public void addBall(Circle ball) {
+    ball.setLocation(ball.getX() + OFFSET.x, ball.getY() + OFFSET.y);
+    balls.add(ball);
+  }
+
+  public void addPocket(Circle pocket) {
+    pocket.setLocation(pocket.getX() + OFFSET.x, pocket.getY() + OFFSET.y);
+    pockets.add(pocket);
+  }
+
+  public void updateBalls(List<Point> coordinates) {
+    for (int i = 0; i < coordinates.size(); i++) {
+      this.balls.get(i).setLocation(coordinates.get(i).x + OFFSET.x, coordinates.get(i).y + OFFSET.y);
+    }
   }
 
   @Override
-  protected void paintComponent(Graphics g) {
-    super.paintComponent(g);
+  public void paint(Graphics g) {
+    super.paint(g);
     g.drawImage(background, 0, 0, this);
-    for (Circle circle : circles) {
-      circle.paint(g);
+    for (Circle pocket : pockets) {
+      pocket.paint(g);
+    }
+    for (Circle ball : balls) {
+      ball.paint(g);
     }
   }
 }
