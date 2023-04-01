@@ -22,28 +22,40 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
   }
 
   @Override
-  public void run() {
-    view.attachPresenter(this);
-    field.setListener(this);
-    for (Pocket pocket : field.getPockets()) {
-      view.addPocket(new Point((int) pocket.x(), (int) pocket.y()), (int) Pocket.RADIUS);
-    }
+  public void newGame() {
+    field.reset();
+    view.clear();
+
     Ball cueBall = field.getCueBall();
-    view.addCueBall(new Point((int) cueBall.getX(), (int) cueBall.getY()), (int) Ball.RADIUS);
+    view.addCueBall((int) cueBall.getX(), (int) cueBall.getY(), (int) Ball.RADIUS);
     List<Ball> balls = field.getBalls();
     for (int i = 1; i < balls.size(); i++) {
-      view.addBall(new Point((int) balls.get(i).getX(), (int) balls.get(i).getY()), (int) Ball.RADIUS);
+      view.addBall((int) balls.get(i).getX(), (int) balls.get(i).getY(), (int) Ball.RADIUS);
+    }
+    view.start();
+  }
+
+  @Override
+  public void run() {
+    view.attachListener(this);
+    field.setListener(this);
+    for (Pocket pocket : field.getPockets()) {
+      view.addPocket((int) pocket.x(), (int) pocket.y(), (int) Pocket.RADIUS);
     }
   }
 
   @Override
-  public void updateAll(float dt) {
+  public void moveBalls(float dt) {
     field.update(dt);
+  }
+
+  @Override
+  public void ballsMoved() {
     view.updateBalls(getBallsCoordinates());
   }
 
   @Override
-  public void ballInPocket(int index) {
+  public void ballInPocket(int ballIndex) {
 
   }
 
@@ -57,13 +69,5 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
   @Override
   public void cueStrike(float vx, float vy) {
     field.getCueBall().setVelocity(vx, vy);
-//    while (!field.isMotionless()) {
-//      try {
-//        Thread.sleep(10);
-//      } catch (InterruptedException e) {
-//        throw new RuntimeException(e);
-//      }
-//      field.update();
-//    }
   }
 }

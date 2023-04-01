@@ -55,7 +55,7 @@ public class Ball {
   }
 
   public boolean collides(Ball other) {
-    return (x - other.x) * (x - other.x) + (y - other.y) * (y - other.y) <= 4 * RADIUS * RADIUS + 2;
+    return (x - other.x) * (x - other.x) + (y - other.y) * (y - other.y) <= 4 * RADIUS * RADIUS;
   }
 
   public void hit(Ball other) {

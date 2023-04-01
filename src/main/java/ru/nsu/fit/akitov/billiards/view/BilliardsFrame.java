@@ -1,7 +1,5 @@
 package ru.nsu.fit.akitov.billiards.view;
 
-import ru.nsu.fit.akitov.billiards.presenter.BilliardsPresenter;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -16,33 +14,58 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
   private static final String NAME = "Billiards";
   private static final String MENU = "Menu";
   private static final String NEW_GAME = "New game";
-  private static final String HIGH_SCORES = "High scores";
   private static final String EXIT = "Exit";
 
   private final Timer timer;
 
   private final Table table;
 
-  private BilliardsPresenter presenter;
+  private ViewListener listener;
 
-  public BilliardsFrame(int sizeY) {
+  public BilliardsFrame() {
     super(NAME);
-    setSize(1920, 1080);
-    setVisible(true);
-    setExtendedState(MAXIMIZED_BOTH);
-    setDefaultCloseOperation(EXIT_ON_CLOSE);
+    this.setExtendedState(MAXIMIZED_BOTH);
+    this.setPreferredSize(new Dimension(1920, 1080));
+    this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+    this.setVisible(true);
 
     table = new Table("src/main/images/table.png");
-    add(table);
+    table.setLocation(0, 100);
+    this.add(table);
 
     timer = new Timer(2, new ActionListener() {
       @Override
-      public void actionPerformed(ActionEvent e) {
-        presenter.updateAll(timer.getDelay() * 0.001f);
+      public void actionPerformed(ActionEvent event) {
+        listener.moveBalls(timer.getDelay() * 0.001f);
       }
     });
-    timer.restart();
 
+
+    setupMenu();
+    pack();
+  }
+
+  private void setupMenu() {
+    JMenuBar menuBar = new JMenuBar();
+    menuBar.setBounds(0, 0, 100, 50);
+    JMenu menu = new JMenu(MENU);
+
+    JMenuItem newGameItem = new JMenuItem(NEW_GAME);
+    JMenuItem exitItem = new JMenuItem(EXIT);
+
+    newGameItem.addActionListener(event -> listener.newGame());
+    exitItem.addActionListener(event -> System.exit(0));
+
+    menu.add(newGameItem);
+    menu.add(exitItem);
+    menuBar.add(menu);
+
+    this.setJMenuBar(menuBar);
+  }
+
+  @Override
+  public void start() {
+    timer.start();
     addKeyListener(new KeyListener() {
       @Override
       public void keyTyped(KeyEvent e) {
@@ -51,35 +74,40 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
       @Override
       public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-          presenter.cueStrike(2000.0f, 2000.0f);
+          listener.cueStrike(2000.0f, 2500.0f);
         }
       }
 
       @Override
       public void keyReleased(KeyEvent e) {
-
       }
     });
+    repaint();
   }
 
   @Override
-  public void attachPresenter(BilliardsPresenter presenter) {
-    this.presenter = presenter;
+  public void clear() {
+    table.clear();
   }
 
   @Override
-  public void addCueBall(Point center, int radius) {
-    table.addBall(new Circle(radius, center.x, center.y, Color.darkGray));
+  public void attachListener(ViewListener listener) {
+    this.listener = listener;
   }
 
   @Override
-  public void addBall(Point center, int radius) {
-    table.addBall(new Circle(radius, center.x, center.y, Color.white));
+  public void addCueBall(int x, int y, int radius) {
+    table.addBall(new Circle(radius, x, y, Color.darkGray));
   }
 
   @Override
-  public void addPocket(Point center, int radius) {
-    table.addPocket(new Circle(radius, center.x, center.y, Color.black));
+  public void addBall(int x, int y, int radius) {
+    table.addBall(new Circle(radius, x, y, Color.white));
+  }
+
+  @Override
+  public void addPocket(int x, int y, int radius) {
+    table.addPocket(new Circle(radius, x, y, Color.black));
   }
 
   @Override

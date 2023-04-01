@@ -10,7 +10,7 @@ public class Main {
 
   public static void main(String[] args) {
     Field field = new Field(2 * SIZE_Y, SIZE_Y);
-    BilliardsView view = new BilliardsFrame(SIZE_Y);
+    BilliardsView view = new BilliardsFrame();
     BilliardsPresenter presenter = new BilliardsPresenter(field, view);
     presenter.run();
   }
