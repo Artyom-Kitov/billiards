@@ -37,16 +37,16 @@ public class Field {
 
   public void reset() {
     balls = new ArrayList<>();
-    cueBall = new Ball(200, 200);
-    balls.add(cueBall);
-    for (int i = 0; i < 15; i++) {
-      balls.add(new Ball(400 + 62 * (i % 4), 400 + 62 * (i / 4)));
+    cueBall = new Ball(sizeX / 4 * 3, sizeY / 2);
+    for (int i = 0; i < 16; i++) {
+      balls.add(new Ball(400 + 64 * (i % 4), sizeY / 2 - 64 * 2 + 64 * (i / 4)));
     }
-
-
   }
 
   public boolean isMotionless() {
+    if (!cueBall.isMotionless()) {
+      return false;
+    }
     for (Ball ball : balls) {
       if (!ball.isMotionless()) {
         return false;
@@ -64,6 +64,13 @@ public class Field {
   }
 
   private void move(float dt) {
+    cueBall.move(dt, SURFACE_FRICTION, 10);
+    if (cueBall.getX() - Ball.RADIUS < 0 || cueBall.getX() + Ball.RADIUS > sizeX) {
+      cueBall.setVelocity(-cueBall.getVelocityX(), cueBall.getVelocityY());
+    }
+    if (cueBall.getY() - Ball.RADIUS < 0 || cueBall.getY() + Ball.RADIUS > sizeY) {
+      cueBall.setVelocity(cueBall.getVelocityX(), -cueBall.getVelocityY());
+    }
     for (Ball ball : balls) {
       ball.move(dt, SURFACE_FRICTION, 10);
       if (ball.getX() - Ball.RADIUS < 0 || ball.getX() + Ball.RADIUS > sizeX) {
@@ -77,19 +84,27 @@ public class Field {
   }
 
   private void updateVelocities() {
+    for (Ball ball : balls) {
+      if (cueBall.collides(ball)) {
+        cueBall.hit(ball);
+      }
+    }
     for (int i = 0; i < balls.size(); i++) {
       for (int j = i + 1; j < balls.size(); j++) {
         if (!balls.get(i).collides(balls.get(j))) {
           continue;
         }
         balls.get(i).hit(balls.get(j));
-//      balls.get(i).move(dt, SURFACE_FRICTION, 10);
-//      balls.get(j).move(dt, SURFACE_FRICTION, 10);
       }
     }
   }
 
   private void checkPockets() {
+    for (Pocket pocket : pockets) {
+      if (cueBall.isInPocket(pocket)) {
+        // listener.cueBallInPocket
+      }
+    }
     for (int i = 0; i < balls.size(); i++) {
       for (Pocket pocket : pockets) {
         if (balls.get(i).isInPocket(pocket)) {
@@ -101,6 +116,7 @@ public class Field {
 
   public void update(float dt) {
     if (isMotionless()) {
+      listener.isMotionless();
       return;
     }
     move(dt);

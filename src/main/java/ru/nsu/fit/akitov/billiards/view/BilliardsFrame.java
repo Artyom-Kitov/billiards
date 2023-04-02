@@ -2,10 +2,7 @@ package ru.nsu.fit.akitov.billiards.view;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 
 import java.util.List;
 
@@ -19,6 +16,7 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
   private final Timer timer;
 
   private final Table table;
+  private final Cue cue;
 
   private ViewListener listener;
 
@@ -33,13 +31,14 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
     table.setLocation(0, 100);
     this.add(table);
 
+    cue = table.getCue();
+
     timer = new Timer(2, new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent event) {
         listener.moveBalls(timer.getDelay() * 0.001f);
       }
     });
-
 
     setupMenu();
     pack();
@@ -53,7 +52,10 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
     JMenuItem newGameItem = new JMenuItem(NEW_GAME);
     JMenuItem exitItem = new JMenuItem(EXIT);
 
-    newGameItem.addActionListener(event -> listener.newGame());
+    newGameItem.addActionListener(event -> {
+      listener.newGame();
+      performCueStrike();
+    });
     exitItem.addActionListener(event -> System.exit(0));
 
     menu.add(newGameItem);
@@ -66,23 +68,33 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
   @Override
   public void start() {
     timer.start();
-    addKeyListener(new KeyListener() {
-      @Override
-      public void keyTyped(KeyEvent e) {
-      }
-
+    addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-          listener.cueStrike(2000.0f, 2500.0f);
+        if (timer.isRunning()) {
+          return;
         }
-      }
-
-      @Override
-      public void keyReleased(KeyEvent e) {
+        switch (e.getKeyCode()) {
+          case KeyEvent.VK_SPACE -> {
+            timer.restart();
+            cue.setVisible(false);
+            float angle = cue.getAngle();
+            float force = cue.getForce();
+            listener.cueStrike(force * (float) Math.cos(angle), force * (float) Math.sin(angle));
+          }
+          case KeyEvent.VK_LEFT -> cue.rotate((float) Math.PI / 180.0f);
+          case KeyEvent.VK_RIGHT -> cue.rotate((float) -Math.PI / 180.0f);
+          case KeyEvent.VK_UP -> cue.addForce(200.0f);
+          case KeyEvent.VK_DOWN -> cue.addForce(-200.0f);
+        }
+        repaint();
       }
     });
-    repaint();
+  }
+
+  @Override
+  public void stop() {
+    timer.stop();
   }
 
   @Override
@@ -97,7 +109,7 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
 
   @Override
   public void addCueBall(int x, int y, int radius) {
-    table.addBall(new Circle(radius, x, y, Color.darkGray));
+    table.setCueBall(new Circle(radius, x, y, Color.darkGray));
   }
 
   @Override
@@ -111,8 +123,15 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
   }
 
   @Override
-  public void updateBalls(List<Point> balls) {
-    table.updateBalls(balls);
+  public void updateBalls(Point cueBall, List<Point> balls) {
+    table.updateBalls(cueBall, balls);
+    repaint();
+  }
+
+  @Override
+  public void performCueStrike() {
+    table.moveCue();
+    cue.setVisible(true);
     repaint();
   }
 }

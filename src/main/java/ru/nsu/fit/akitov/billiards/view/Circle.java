@@ -14,6 +14,10 @@ public class Circle extends JComponent {
     setLocation(x, y);
   }
 
+  public int getRadius() {
+    return radius;
+  }
+
   @Override
   public void paint(Graphics g) {
     super.paint(g);

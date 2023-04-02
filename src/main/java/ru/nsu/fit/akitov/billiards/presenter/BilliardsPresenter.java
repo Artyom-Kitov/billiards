@@ -29,8 +29,8 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
     Ball cueBall = field.getCueBall();
     view.addCueBall((int) cueBall.getX(), (int) cueBall.getY(), (int) Ball.RADIUS);
     List<Ball> balls = field.getBalls();
-    for (int i = 1; i < balls.size(); i++) {
-      view.addBall((int) balls.get(i).getX(), (int) balls.get(i).getY(), (int) Ball.RADIUS);
+    for (Ball ball : balls) {
+      view.addBall((int) ball.getX(), (int) ball.getY(), (int) Ball.RADIUS);
     }
     view.start();
   }
@@ -51,7 +51,7 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
 
   @Override
   public void ballsMoved() {
-    view.updateBalls(getBallsCoordinates());
+    view.updateBalls(getCueBallCoordinates(), getBallsCoordinates());
   }
 
   @Override
@@ -59,6 +59,9 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
 
   }
 
+  private Point getCueBallCoordinates() {
+    return new Point((int) field.getCueBall().getX(), (int) field.getCueBall().getY());
+  }
   private List<Point> getBallsCoordinates() {
     List<Point> coordinates = new ArrayList<>();
     for (Ball ball : field.getBalls()) {
@@ -69,5 +72,11 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
   @Override
   public void cueStrike(float vx, float vy) {
     field.getCueBall().setVelocity(vx, vy);
+  }
+
+  @Override
+  public void isMotionless() {
+    view.stop();
+    view.performCueStrike();
   }
 }

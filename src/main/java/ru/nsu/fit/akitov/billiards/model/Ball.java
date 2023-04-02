@@ -3,7 +3,7 @@ package ru.nsu.fit.akitov.billiards.model;
 public class Ball {
 
   public static final float RADIUS = 30;
-  private static final float COMPARE_PRECISION = 0.001f;
+  private static final float COMPARE_PRECISION = 0.5f;
 
   private float x;
   private float y;
