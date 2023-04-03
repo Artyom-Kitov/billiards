@@ -2,8 +2,6 @@ package ru.nsu.fit.akitov.billiards.view;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,27 +14,16 @@ public class Table extends JComponent {
   private final List<Circle> balls;
   private Circle cueBall;
   private final List<Circle> pockets;
-  private final Cue cue;
+  private final CuePanel cuePanel;
 
   public Table(String path) {
     setLayout(null);
     background = Toolkit.getDefaultToolkit().getImage(path);
     balls = new ArrayList<>();
     pockets = new ArrayList<>();
-    cue = new Cue("src/main/images/cue.png", 30);
-    cue.setVisible(false);
+    cuePanel = new CuePanel("src/main/resources/cue.png", 30);
+    cuePanel.setVisible(false);
     this.setVisible(true);
-
-    this.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_A) {
-          cue.rotate((float) Math.PI / 180.0f);
-        } else if (e.getKeyCode() == KeyEvent.VK_D) {
-          cue.rotate((float) Math.PI / -180.0f);
-        }
-      }
-    });
   }
 
   public void addBall(Circle ball) {
@@ -65,12 +52,12 @@ public class Table extends JComponent {
     balls.clear();
   }
 
-  public Cue getCue() {
-    return cue;
+  public CuePanel getCuePanel() {
+    return cuePanel;
   }
 
   public void moveCue() {
-    cue.setPosition(cueBall.getX(), cueBall.getY());
+    cuePanel.setPosition(cueBall.getX(), cueBall.getY());
   }
 
   @Override
@@ -86,6 +73,6 @@ public class Table extends JComponent {
     for (Circle ball : balls) {
       ball.paint(g);
     }
-    cue.paint(g);
+    cuePanel.paint(g);
   }
 }

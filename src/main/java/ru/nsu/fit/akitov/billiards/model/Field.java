@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Field {
 
-  private static final float SURFACE_FRICTION = 30;
+  private static final float SURFACE_FRICTION = 40;
 
   private final float sizeX;
   private final float sizeY;
@@ -15,6 +15,7 @@ public class Field {
   private final List<Pocket> pockets;
   private List<Ball> balls;
   private Ball cueBall;
+  private final Cue cue;
 
   public Field(int sizeX, int sizeY) {
     this.sizeX = sizeX;
@@ -25,6 +26,8 @@ public class Field {
       pockets.add(new Pocket(i * sizeX / 2.0f, 0));
       pockets.add(new Pocket(i * sizeX / 2.0f, sizeY));
     }
+
+    cue = new Cue();
   }
 
   public Ball getCueBall() {
@@ -123,5 +126,26 @@ public class Field {
     updateVelocities();
     checkPockets();
     listener.ballsMoved();
+  }
+
+  public void addCueVelocity(float dv) {
+    cue.addVelocity(dv);
+  }
+
+  public void rotateCue(float theta) {
+    cue.rotate(theta);
+  }
+
+  public float getCueVelocity() {
+    return cue.getVelocity();
+  }
+
+  public float getCueAngle() {
+    return cue.getAngle();
+  }
+
+  public void performCueStrike() {
+    cue.strike(cueBall);
+    listener.strikePerformed();
   }
 }

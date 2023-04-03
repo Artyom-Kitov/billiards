@@ -7,18 +7,33 @@ import ru.nsu.fit.akitov.billiards.model.Pocket;
 import ru.nsu.fit.akitov.billiards.view.BilliardsView;
 import ru.nsu.fit.akitov.billiards.view.ViewListener;
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BilliardsPresenter implements Runnable, FieldListener, ViewListener {
+  private static final float DELTA_VELOCITY = 100.0f;
+  private static final float DELTA_ANGLE = (float) Math.PI / 180.0f;
 
   private final BilliardsView view;
   private final Field field;
 
+  private final Timer timer;
+
   public BilliardsPresenter(Field field, BilliardsView view) {
     this.field = field;
     this.view = view;
+
+    timer = new Timer(2, new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        field.update(timer.getDelay() * 0.001f);
+        view.updateBalls(getCueBallCoordinates(), getBallsCoordinates());
+      }
+    });
   }
 
   @Override
@@ -32,7 +47,7 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
     for (Ball ball : balls) {
       view.addBall((int) ball.getX(), (int) ball.getY(), (int) Ball.RADIUS);
     }
-    view.start();
+    view.setCueVisible(true);
   }
 
   @Override
@@ -42,11 +57,53 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
     for (Pocket pocket : field.getPockets()) {
       view.addPocket((int) pocket.x(), (int) pocket.y(), (int) Pocket.RADIUS);
     }
+    view.start();
   }
 
   @Override
-  public void moveBalls(float dt) {
-    field.update(dt);
+  public void onSpacePressed() {
+    if (timer.isRunning()) {
+      return;
+    }
+    field.performCueStrike();
+    view.setCueVisible(false);
+    timer.restart();
+  }
+
+  @Override
+  public void onLeftPressed() {
+    if (timer.isRunning()) {
+      return;
+    }
+    field.rotateCue(DELTA_ANGLE);
+    view.updateCue(field.getCueVelocity(), field.getCueAngle());
+  }
+
+  @Override
+  public void onRightPressed() {
+    if (timer.isRunning()) {
+      return;
+    }
+    field.rotateCue(-DELTA_ANGLE);
+    view.updateCue(field.getCueVelocity(), field.getCueAngle());
+  }
+
+  @Override
+  public void onUpPressed() {
+    if (timer.isRunning()) {
+      return;
+    }
+    field.addCueVelocity(-DELTA_VELOCITY);
+    view.updateCue(field.getCueVelocity(), field.getCueAngle());
+  }
+
+  @Override
+  public void onDownPressed() {
+    if (timer.isRunning()) {
+      return;
+    }
+    field.addCueVelocity(DELTA_VELOCITY);
+    view.updateCue(field.getCueVelocity(), field.getCueAngle());
   }
 
   @Override
@@ -69,14 +126,17 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
     }
     return coordinates;
   }
-  @Override
-  public void cueStrike(float vx, float vy) {
-    field.getCueBall().setVelocity(vx, vy);
-  }
 
   @Override
   public void isMotionless() {
-    view.stop();
-    view.performCueStrike();
+    timer.stop();
+    view.setCueVisible(true);
+    view.updateCue(field.getCueVelocity(), field.getCueAngle());
+  }
+
+  @Override
+  public void strikePerformed() {
+    view.setCueVisible(false);
+    timer.start();
   }
 }

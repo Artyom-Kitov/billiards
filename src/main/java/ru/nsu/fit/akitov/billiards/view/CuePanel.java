@@ -3,8 +3,7 @@ package ru.nsu.fit.akitov.billiards.view;
 import javax.swing.*;
 import java.awt.*;
 
-public class Cue extends JComponent {
-  private static final float MAX_FORCE = 4000.0f;
+public class CuePanel extends JComponent {
   private static final float DISPLAY_COEFFICIENT = 0.05f;
   private final Image body;
   private final int cueBallRadius;
@@ -15,10 +14,10 @@ public class Cue extends JComponent {
   private int x;
   private int y;
 
-  private float force;
+  private float velocity;
   private float angle;
 
-  public Cue(String path, int cueBallRadius) {
+  public CuePanel(String path, int cueBallRadius) {
     body = Toolkit.getDefaultToolkit().getImage(path);
     this.cueBallRadius = cueBallRadius;
     width = 756;
@@ -30,30 +29,12 @@ public class Cue extends JComponent {
     this.y = y - height / 2;
   }
 
-  public void rotate(float theta) {
-    angle += theta;
-    if (angle >= Math.PI * 2) {
-      angle -= Math.PI * 2;
-    } else if (angle <= 0) {
-      angle += Math.PI * 2;
-    }
+  public void setAngle(float angle) {
+    this.angle = angle;
   }
 
-  public void addForce(float df) {
-    force += df;
-    if (force < 0.0f) {
-      force = 0.0f;
-    } else if (force > MAX_FORCE) {
-      force = MAX_FORCE;
-    }
-  }
-
-  public float getAngle() {
-    return angle;
-  }
-
-  public float getForce() {
-    return force;
+  public void setVelocity(float velocity) {
+    this.velocity = velocity;
   }
 
   @Override
@@ -63,7 +44,7 @@ public class Cue extends JComponent {
       return;
     }
     Graphics2D g2d = (Graphics2D) g;
-    int drawnX = (int) (x - cueBallRadius - DISPLAY_COEFFICIENT * force);
+    int drawnX = (int) (x - cueBallRadius - DISPLAY_COEFFICIENT * velocity);
     int drawnY = y;
     g2d.rotate(angle, x + width, y + height / 2);
     g2d.drawImage(body, drawnX, drawnY, this);
