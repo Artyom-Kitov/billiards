@@ -19,6 +19,20 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
 
   private ViewListener listener;
 
+  private KeyAdapter onKeyDown = new KeyAdapter() {
+    @Override
+    public void keyPressed(KeyEvent e) {
+      switch (e.getKeyCode()) {
+        case KeyEvent.VK_SPACE -> listener.onSpacePressed();
+        case KeyEvent.VK_LEFT -> listener.onLeftPressed();
+        case KeyEvent.VK_RIGHT -> listener.onRightPressed();
+        case KeyEvent.VK_UP -> listener.onUpPressed();
+        case KeyEvent.VK_DOWN -> listener.onDownPressed();
+      }
+      repaint();
+    }
+  };
+
   public BilliardsFrame() {
     super(NAME);
     this.setExtendedState(MAXIMIZED_BOTH);
@@ -26,10 +40,9 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
     this.setPreferredSize(new Dimension(1920, 1080));
     this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     this.setVisible(true);
+    this.setLayout(new BorderLayout());
 
     table = new Table("src/main/resources/table.png");
-    // CR: layout
-    table.setLocation(0, 100);
     this.add(table);
 
     cuePanel = table.getCuePanel();
@@ -40,13 +53,12 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
 
   private void setupMenu() {
     JMenuBar menuBar = new JMenuBar();
-    menuBar.setBounds(0, 0, 100, 50);
     JMenu menu = new JMenu(MENU);
 
     JMenuItem newGameItem = new JMenuItem(NEW_GAME);
     JMenuItem exitItem = new JMenuItem(EXIT);
 
-    newGameItem.addActionListener((event) -> listener.newGame());
+    newGameItem.addActionListener(event -> listener.newGame());
     exitItem.addActionListener(event -> System.exit(0));
 
     menu.add(newGameItem);
@@ -58,19 +70,7 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
 
   @Override
   public void start() {
-    addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyPressed(KeyEvent e) {
-        switch (e.getKeyCode()) {
-          case KeyEvent.VK_SPACE -> listener.onSpacePressed();
-          case KeyEvent.VK_LEFT -> listener.onLeftPressed();
-          case KeyEvent.VK_RIGHT -> listener.onRightPressed();
-          case KeyEvent.VK_UP -> listener.onUpPressed();
-          case KeyEvent.VK_DOWN -> listener.onDownPressed();
-        }
-        repaint();
-      }
-    });
+    addKeyListener(onKeyDown);
   }
 
   @Override
@@ -112,8 +112,13 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
   }
 
   @Override
-  public void setCueVisible(boolean b) {
+  public void setCueAvailable(boolean b) {
     cuePanel.setVisible(b);
+    if (b) {
+      this.addKeyListener(onKeyDown);
+    } else {
+      this.removeKeyListener(onKeyDown);
+    }
     repaint();
   }
 }

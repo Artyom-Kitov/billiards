@@ -10,7 +10,7 @@ public interface BilliardsView {
   void addCueBall(int x, int y, int radius);
   void addBall(int x, int y, int radius);
   void addPocket(int x, int y, int radius);
-  void setCueVisible(boolean b);
+  void setCueAvailable(boolean b);
   void updateBalls(Point cueBall, List<Point> balls);
   void updateCue(float velocity, float angle);
 }
