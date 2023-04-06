@@ -13,7 +13,7 @@ public class Field {
   private FieldListener listener;
 
   private final List<Pocket> pockets;
-  private List<Ball> balls;
+  private final List<Ball> balls;
   private Ball cueBall;
   private final Cue cue;
 
@@ -21,6 +21,7 @@ public class Field {
     this.sizeX = sizeX;
     this.sizeY = sizeY;
 
+    balls = new ArrayList<>();
     pockets = new ArrayList<>();
     for (int i = 0; i < 3; i++) {
       pockets.add(new Pocket(i * sizeX / 2.0f, 0));
@@ -39,9 +40,10 @@ public class Field {
   }
 
   public void reset() {
-    balls = new ArrayList<>();
+    balls.clear();
     cueBall = new Ball(sizeX / 4 * 3, sizeY / 2);
     for (int i = 0; i < 16; i++) {
+      // CR: pass from main
       balls.add(new Ball(400 + 64 * (i % 4), sizeY / 2 - 64 * 2 + 64 * (i / 4)));
     }
   }

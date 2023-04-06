@@ -8,6 +8,7 @@ import java.util.List;
 
 public class BilliardsFrame extends JFrame implements BilliardsView {
 
+  // CR: move to properties
   private static final String NAME = "Billiards";
   private static final String MENU = "Menu";
   private static final String NEW_GAME = "New game";
@@ -21,11 +22,13 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
   public BilliardsFrame() {
     super(NAME);
     this.setExtendedState(MAXIMIZED_BOTH);
+    // CR: hardcode
     this.setPreferredSize(new Dimension(1920, 1080));
     this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     this.setVisible(true);
 
     table = new Table("src/main/resources/table.png");
+    // CR: layout
     table.setLocation(0, 100);
     this.add(table);
 

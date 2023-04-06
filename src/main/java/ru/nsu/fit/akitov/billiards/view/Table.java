@@ -21,6 +21,7 @@ public class Table extends JComponent {
     background = Toolkit.getDefaultToolkit().getImage(path);
     balls = new ArrayList<>();
     pockets = new ArrayList<>();
+    // CR: hardcode
     cuePanel = new CuePanel("src/main/resources/cue.png", 30);
     cuePanel.setVisible(false);
     this.setVisible(true);
@@ -67,6 +68,7 @@ public class Table extends JComponent {
     for (Circle pocket : pockets) {
       pocket.paint(g);
     }
+    // CR: maybe draw even before new game
     if (cueBall != null) {
       cueBall.paint(g);
     }

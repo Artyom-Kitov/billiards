@@ -3,6 +3,7 @@ package ru.nsu.fit.akitov.billiards.view;
 import javax.swing.*;
 import java.awt.*;
 
+// CR: BallView?
 public class Circle extends JComponent {
 
   private final int radius;

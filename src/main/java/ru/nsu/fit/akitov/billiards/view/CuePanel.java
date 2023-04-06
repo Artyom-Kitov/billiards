@@ -3,6 +3,7 @@ package ru.nsu.fit.akitov.billiards.view;
 import javax.swing.*;
 import java.awt.*;
 
+// CR: rename
 public class CuePanel extends JComponent {
   private static final float DISPLAY_COEFFICIENT = 0.05f;
   private final Image body;

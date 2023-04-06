@@ -108,6 +108,7 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
 
   @Override
   public void ballsMoved() {
+    // CR: use custom point
     view.updateBalls(getCueBallCoordinates(), getBallsCoordinates());
   }
 
@@ -119,6 +120,7 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
   private Point getCueBallCoordinates() {
     return new Point((int) field.getCueBall().getX(), (int) field.getCueBall().getY());
   }
+
   private List<Point> getBallsCoordinates() {
     List<Point> coordinates = new ArrayList<>();
     for (Ball ball : field.getBalls()) {
@@ -137,6 +139,7 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
   @Override
   public void strikePerformed() {
     view.setCueVisible(false);
+    // CR: call removeKeyListener();
     timer.start();
   }
 }
