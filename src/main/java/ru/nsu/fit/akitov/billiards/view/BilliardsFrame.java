@@ -1,5 +1,8 @@
 package ru.nsu.fit.akitov.billiards.view;
 
+import ru.nsu.fit.akitov.billiards.utils.GameProperties;
+import ru.nsu.fit.akitov.billiards.utils.Point2D;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -8,18 +11,15 @@ import java.util.List;
 
 public class BilliardsFrame extends JFrame implements BilliardsView {
 
-  // CR: move to properties
-  private static final String NAME = "Billiards";
-  private static final String MENU = "Menu";
-  private static final String NEW_GAME = "New game";
-  private static final String EXIT = "Exit";
+  private final String menuOption;
+  private final String newGameOption;
+  private final String exitOption;
 
-  private final Table table;
-  private final CuePanel cuePanel;
+  private final FieldPanel fieldPanel;
 
   private ViewListener listener;
 
-  private KeyAdapter onKeyDown = new KeyAdapter() {
+  private final KeyAdapter onKeyDown = new KeyAdapter() {
     @Override
     public void keyPressed(KeyEvent e) {
       switch (e.getKeyCode()) {
@@ -33,19 +33,29 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
     }
   };
 
-  public BilliardsFrame() {
-    super(NAME);
-    this.setExtendedState(MAXIMIZED_BOTH);
-    // CR: hardcode
-    this.setPreferredSize(new Dimension(1920, 1080));
+  public BilliardsFrame(GameProperties properties) {
+    super(properties.gameName());
+
+    int width = (int) (2 * properties.fieldSize() + 2 * properties.fieldSize() * properties.relativeBorderSize());
+    int height = (int) (properties.fieldSize() + 2 * properties.fieldSize() * properties.relativeBorderSize());
+    this.setPreferredSize(new Dimension(width, height));
     this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     this.setVisible(true);
     this.setLayout(new BorderLayout());
+    this.setResizable(false);
 
-    table = new Table("src/main/resources/table.png");
-    this.add(table);
+    menuOption = properties.menuOption();
+    newGameOption = properties.newGameOption();
+    exitOption = properties.exitOption();
 
-    cuePanel = table.getCuePanel();
+    fieldPanel = new FieldPanel(width, height, "table.png", properties.fieldSize() / properties.relativeBallSize() / 2);
+    fieldPanel.setBorderSize((int) (properties.fieldSize() * properties.relativeBorderSize()));
+    this.add(fieldPanel);
+
+    Image icon = Toolkit.getDefaultToolkit().getImage(
+            Thread.currentThread().getContextClassLoader().getResource("logo.png")
+    );
+    this.setIconImage(icon);
 
     setupMenu();
     pack();
@@ -53,10 +63,10 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
 
   private void setupMenu() {
     JMenuBar menuBar = new JMenuBar();
-    JMenu menu = new JMenu(MENU);
+    JMenu menu = new JMenu(menuOption);
 
-    JMenuItem newGameItem = new JMenuItem(NEW_GAME);
-    JMenuItem exitItem = new JMenuItem(EXIT);
+    JMenuItem newGameItem = new JMenuItem(newGameOption);
+    JMenuItem exitItem = new JMenuItem(exitOption);
 
     newGameItem.addActionListener(event -> listener.newGame());
     exitItem.addActionListener(event -> System.exit(0));
@@ -71,11 +81,12 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
   @Override
   public void start() {
     addKeyListener(onKeyDown);
+    repaint();
   }
 
   @Override
   public void clear() {
-    table.clear();
+    fieldPanel.clear();
   }
 
   @Override
@@ -85,35 +96,40 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
 
   @Override
   public void addCueBall(int x, int y, int radius) {
-    table.setCueBall(new Circle(radius, x, y, Color.darkGray));
+    fieldPanel.setCueBall(new Circle(radius, x, y, Color.darkGray));
   }
 
   @Override
   public void addBall(int x, int y, int radius) {
-    table.addBall(new Circle(radius, x, y, Color.white));
+    fieldPanel.addBall(new Circle(radius, x, y, Color.white));
   }
 
   @Override
   public void addPocket(int x, int y, int radius) {
-    table.addPocket(new Circle(radius, x, y, Color.black));
+    fieldPanel.addPocket(new Circle(radius, x, y, Color.black));
   }
 
   @Override
-  public void updateBalls(Point cueBall, List<Point> balls) {
-    table.updateBalls(cueBall, balls);
+  public void updateBalls(Point2D cueBall, List<Point2D> balls) {
+    fieldPanel.updateBalls(cueBall, balls);
     repaint();
   }
 
   @Override
   public void updateCue(float velocity, float angle) {
-    cuePanel.setVelocity(velocity);
-    cuePanel.setAngle(angle);
-    table.moveCue();
+    fieldPanel.setCueVelocity(velocity);
+    fieldPanel.setCueAngle(angle);
+    fieldPanel.moveCue();
+  }
+
+  @Override
+  public void removeBall(int index) {
+    fieldPanel.removeBall(index);
   }
 
   @Override
   public void setCueAvailable(boolean b) {
-    cuePanel.setVisible(b);
+    fieldPanel.setCueVisible(b);
     if (b) {
       this.addKeyListener(onKeyDown);
     } else {

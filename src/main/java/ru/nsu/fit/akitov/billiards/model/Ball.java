@@ -2,18 +2,19 @@ package ru.nsu.fit.akitov.billiards.model;
 
 public class Ball {
 
-  public static final float RADIUS = 30;
   private static final float COMPARE_PRECISION = 0.5f;
 
   private float x;
   private float y;
+  private final float radius;
 
   private float vx;
   private float vy;
 
-  public Ball(float x, float y) {
+  public Ball(float x, float y, float radius) {
     this.x = x;
     this.y = y;
+    this.radius = radius;
     this.vx = 0.0f;
     this.vy = 0.0f;
   }
@@ -55,7 +56,7 @@ public class Ball {
   }
 
   public boolean collides(Ball other) {
-    return (x - other.x) * (x - other.x) + (y - other.y) * (y - other.y) <= 4 * RADIUS * RADIUS;
+    return (x - other.x) * (x - other.x) + (y - other.y) * (y - other.y) <= 4 * radius * radius;
   }
 
   public void hit(Ball other) {
@@ -82,6 +83,6 @@ public class Ball {
   }
 
   public boolean isInPocket(Pocket pocket) {
-    return (x - pocket.x()) * (x - pocket.x()) + (y - pocket.y()) * (y - pocket.y()) <= Pocket.RADIUS * Pocket.RADIUS;
+    return (x - pocket.x()) * (x - pocket.x()) + (y - pocket.y()) * (y - pocket.y()) <= pocket.radius() * pocket.radius();
   }
 }

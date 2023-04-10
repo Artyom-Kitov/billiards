@@ -1,6 +1,7 @@
 package ru.nsu.fit.akitov.billiards.view;
 
-import java.awt.*;
+import ru.nsu.fit.akitov.billiards.utils.Point2D;
+
 import java.util.List;
 
 public interface BilliardsView {
@@ -11,6 +12,7 @@ public interface BilliardsView {
   void addBall(int x, int y, int radius);
   void addPocket(int x, int y, int radius);
   void setCueAvailable(boolean b);
-  void updateBalls(Point cueBall, List<Point> balls);
+  void updateBalls(Point2D cueBall, List<Point2D> balls);
   void updateCue(float velocity, float angle);
+  void removeBall(int index);
 }

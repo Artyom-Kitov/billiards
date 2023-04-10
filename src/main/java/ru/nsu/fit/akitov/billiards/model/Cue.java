@@ -1,18 +1,21 @@
 package ru.nsu.fit.akitov.billiards.model;
 
 public class Cue {
-  private static final float MAX_VELOCITY = 4000f;
 
   private float velocity;
   private float angle;
+  private final float maxVelocity;
 
+  public Cue(float maxVelocity) {
+    this.maxVelocity = maxVelocity;
+  }
 
   public void addVelocity(float dv) {
     velocity += dv;
     if (velocity < 0.0f) {
       velocity = 0.0f;
-    } else if (velocity > MAX_VELOCITY) {
-      velocity = MAX_VELOCITY;
+    } else if (velocity > maxVelocity) {
+      velocity = maxVelocity;
     }
   }
 

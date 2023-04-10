@@ -3,9 +3,8 @@ package ru.nsu.fit.akitov.billiards.view;
 import javax.swing.*;
 import java.awt.*;
 
-// CR: rename
-public class CuePanel extends JComponent {
-  private static final float DISPLAY_COEFFICIENT = 0.05f;
+public class CueView extends JComponent {
+  private static final float DISPLAY_COEFFICIENT = 0.02f;
   private final Image body;
   private final int cueBallRadius;
 
@@ -18,8 +17,10 @@ public class CuePanel extends JComponent {
   private float velocity;
   private float angle;
 
-  public CuePanel(String path, int cueBallRadius) {
-    body = Toolkit.getDefaultToolkit().getImage(path);
+  public CueView(String path, int cueBallRadius) {
+    body = Toolkit.getDefaultToolkit().getImage(
+            Thread.currentThread().getContextClassLoader().getResource(path)
+    );
     this.cueBallRadius = cueBallRadius;
     width = 756;
     height = 45;

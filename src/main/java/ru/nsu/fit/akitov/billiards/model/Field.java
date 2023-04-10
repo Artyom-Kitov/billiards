@@ -1,38 +1,56 @@
 package ru.nsu.fit.akitov.billiards.model;
 
+import ru.nsu.fit.akitov.billiards.utils.GameProperties;
+import ru.nsu.fit.akitov.billiards.utils.Point2D;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Field {
 
   private static final float SURFACE_FRICTION = 40;
+  private static final float GRAVITY = 10;
+
+  private final GameProperties properties;
 
   private final float sizeX;
   private final float sizeY;
+  private final float ballRadius;
+  private final float pocketRadius;
+  private final List<Pocket> pockets;
+  private final List<Ball> balls;
+  private final Cue cue;
+  private Ball cueBall;
 
   private FieldListener listener;
 
-  private final List<Pocket> pockets;
-  private final List<Ball> balls;
-  private Ball cueBall;
-  private final Cue cue;
-
-  public Field(int sizeX, int sizeY) {
-    this.sizeX = sizeX;
-    this.sizeY = sizeY;
+  public Field(GameProperties properties) {
+    this.sizeX = properties.fieldSize() * 2;
+    this.sizeY = properties.fieldSize();
+    this.ballRadius = (float) properties.fieldSize() / properties.relativeBallSize() / 2;
+    this.pocketRadius = (float) properties.fieldSize() / properties.relativePocketSize() / 2;
+    this.properties = properties;
 
     balls = new ArrayList<>();
     pockets = new ArrayList<>();
     for (int i = 0; i < 3; i++) {
-      pockets.add(new Pocket(i * sizeX / 2.0f, 0));
-      pockets.add(new Pocket(i * sizeX / 2.0f, sizeY));
+      pockets.add(new Pocket(i * sizeX / 2.0f, 0, pocketRadius));
+      pockets.add(new Pocket(i * sizeX / 2.0f, sizeY, pocketRadius));
     }
 
-    cue = new Cue();
+    cue = new Cue(properties.fieldSize() * properties.relativeCueStrength());
+    reset();
   }
-
   public Ball getCueBall() {
     return cueBall;
+  }
+
+  public float getBallRadius() {
+    return ballRadius;
+  }
+
+  public float getPocketRadius() {
+    return pocketRadius;
   }
 
   public void setListener(FieldListener listener) {
@@ -41,11 +59,23 @@ public class Field {
 
   public void reset() {
     balls.clear();
-    cueBall = new Ball(sizeX / 4 * 3, sizeY / 2);
-    for (int i = 0; i < 16; i++) {
-      // CR: pass from main
-      balls.add(new Ball(400 + 64 * (i % 4), sizeY / 2 - 64 * 2 + 64 * (i / 4)));
+    cueBall = new Ball(sizeX / 4, sizeY / 2, ballRadius);
+
+    int drawn = 0;
+    float x0 = sizeX / 4f * 3f;
+    float y0 = sizeY / 2;
+    float dr = 2 * ballRadius + ballRadius / 8;
+    for (int i = 1; drawn != properties.ballsCount(); i++) {
+      for (int j = 0; j < i && drawn != properties.ballsCount(); j++) {
+        balls.add(new Ball(x0 + dr * (i - 1), y0 - dr * (i / 2)
+                + ((i + 1) % 2) * ballRadius + dr * j, ballRadius));
+        drawn++;
+      }
     }
+  }
+
+  public void removeBall(int index) {
+    balls.remove(index);
   }
 
   public boolean isMotionless() {
@@ -60,29 +90,33 @@ public class Field {
     return true;
   }
 
-  public List<Ball> getBalls() {
-    return balls;
+  public List<Point2D> getBallsCoordinates() {
+    return balls.stream()
+            .map(ball -> new Point2D((int) ball.getX(), (int) ball.getY()))
+            .toList();
   }
 
-  public List<Pocket> getPockets() {
-    return pockets;
+  public List<Point2D> getPocketsCoordinates() {
+    return pockets.stream()
+            .map(pocket -> new Point2D((int) pocket.x(), (int) pocket.y()))
+            .toList();
   }
 
   private void move(float dt) {
-    cueBall.move(dt, SURFACE_FRICTION, 10);
-    if (cueBall.getX() - Ball.RADIUS < 0 || cueBall.getX() + Ball.RADIUS > sizeX) {
+    cueBall.move(dt, SURFACE_FRICTION, GRAVITY);
+    if (cueBall.getX() - ballRadius < 0 || cueBall.getX() + ballRadius > sizeX) {
       cueBall.setVelocity(-cueBall.getVelocityX(), cueBall.getVelocityY());
     }
-    if (cueBall.getY() - Ball.RADIUS < 0 || cueBall.getY() + Ball.RADIUS > sizeY) {
+    if (cueBall.getY() - ballRadius < 0 || cueBall.getY() + ballRadius > sizeY) {
       cueBall.setVelocity(cueBall.getVelocityX(), -cueBall.getVelocityY());
     }
     for (Ball ball : balls) {
-      ball.move(dt, SURFACE_FRICTION, 10);
-      if (ball.getX() - Ball.RADIUS < 0 || ball.getX() + Ball.RADIUS > sizeX) {
+      ball.move(dt, SURFACE_FRICTION, GRAVITY);
+      if (ball.getX() - ballRadius < 0 || ball.getX() + ballRadius > sizeX) {
         ball.setVelocity(-ball.getVelocityX(), ball.getVelocityY());
-        ball.move(dt, SURFACE_FRICTION, 10);
+        ball.move(dt, SURFACE_FRICTION, GRAVITY);
       }
-      if (ball.getY() - Ball.RADIUS < 0 || ball.getY() + Ball.RADIUS > sizeY) {
+      if (ball.getY() - ballRadius < 0 || ball.getY() + ballRadius > sizeY) {
         ball.setVelocity(ball.getVelocityX(), -ball.getVelocityY());
       }
     }
@@ -107,15 +141,19 @@ public class Field {
   private void checkPockets() {
     for (Pocket pocket : pockets) {
       if (cueBall.isInPocket(pocket)) {
-        // listener.cueBallInPocket
+         listener.cueBallInPocket();
       }
     }
+    List<Integer> ballsInPockets = new ArrayList<>();
     for (int i = 0; i < balls.size(); i++) {
       for (Pocket pocket : pockets) {
         if (balls.get(i).isInPocket(pocket)) {
-          listener.ballInPocket(i);
+          ballsInPockets.add(i);
         }
       }
+    }
+    for (int i : ballsInPockets) {
+      listener.ballInPocket(i);
     }
   }
 

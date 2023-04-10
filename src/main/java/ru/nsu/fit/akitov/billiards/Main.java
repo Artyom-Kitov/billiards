@@ -15,11 +15,12 @@ public class Main {
     try {
       props = GameProperties.readFromFile();
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      System.err.println(e.getMessage());
+      return;
     }
 
-    Field field = new Field(props.fieldSize() * 2, props.fieldSize());
-    BilliardsView view = new BilliardsFrame();
+    Field field = new Field(props);
+    BilliardsView view = new BilliardsFrame(props);
     BilliardsPresenter presenter = new BilliardsPresenter(field, view);
     presenter.run();
   }
