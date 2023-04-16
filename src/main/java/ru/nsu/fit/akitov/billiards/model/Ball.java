@@ -2,7 +2,7 @@ package ru.nsu.fit.akitov.billiards.model;
 
 public class Ball {
 
-  private static final float COMPARE_PRECISION = 0.5f;
+  private static final float COMPARE_PRECISION = 1f;
 
   private float x;
   private float y;
@@ -80,6 +80,18 @@ public class Ball {
 
     other.vx = (other.vx - otherCentralProjectionX + thisCentralProjectionX);
     other.vy = (other.vy - otherCentralProjectionY + thisCentralProjectionY);
+  }
+
+  public void unhookFrom(Ball other) {
+    float dx = other.x - x;
+    float dy = other.y - y;
+
+    float distance = (float) Math.sqrt(dx * dx + dy * dy);
+    float cos = dx / distance;
+    float sin = dy / distance;
+
+    other.x = x + (radius + other.radius) * cos;
+    other.y = y + (radius + other.radius) * sin;
   }
 
   public boolean isInPocket(Pocket pocket) {

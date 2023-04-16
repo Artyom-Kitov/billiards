@@ -8,19 +8,24 @@ import java.util.List;
 
 public class Field {
 
+  private final GameProperties properties;
+
   private static final float SURFACE_FRICTION = 40;
   private static final float GRAVITY = 10;
 
-  private final GameProperties properties;
-
   private final float sizeX;
   private final float sizeY;
+
   private final float ballRadius;
+  private final List<Ball> balls;
+
   private final float pocketRadius;
   private final List<Pocket> pockets;
-  private final List<Ball> balls;
+
   private final Cue cue;
   private Ball cueBall;
+
+  private final Clock clock;
 
   private FieldListener listener;
 
@@ -39,6 +44,7 @@ public class Field {
     }
 
     cue = new Cue(properties.fieldSize() * properties.relativeCueStrength());
+    clock = new Clock();
     reset();
   }
   public Ball getCueBall() {
@@ -59,12 +65,13 @@ public class Field {
 
   public void reset() {
     balls.clear();
+    clock.reset();
     cueBall = new Ball(sizeX / 4, sizeY / 2, ballRadius);
 
     int drawn = 0;
     float x0 = sizeX / 4f * 3f;
     float y0 = sizeY / 2;
-    float dr = 2 * ballRadius + ballRadius / 8;
+    float dr = 2 * ballRadius;
     for (int i = 1; drawn != properties.ballsCount(); i++) {
       for (int j = 0; j < i && drawn != properties.ballsCount(); j++) {
         balls.add(new Ball(x0 + dr * (i - 1), y0 - dr * (i / 2)
@@ -126,6 +133,7 @@ public class Field {
     for (Ball ball : balls) {
       if (cueBall.collides(ball)) {
         cueBall.hit(ball);
+        cueBall.unhookFrom(ball);
       }
     }
     for (int i = 0; i < balls.size(); i++) {
@@ -134,6 +142,7 @@ public class Field {
           continue;
         }
         balls.get(i).hit(balls.get(j));
+        balls.get(i).unhookFrom(balls.get(j));
       }
     }
   }
@@ -187,5 +196,17 @@ public class Field {
   public void performCueStrike() {
     cue.strike(cueBall);
     listener.strikePerformed();
+  }
+
+  public void tickClock() {
+    clock.tick();
+  }
+
+  public int getMinutesElapsed() {
+    return clock.getMinutes();
+  }
+
+  public int getSecondsElapsed() {
+    return clock.getSeconds();
   }
 }

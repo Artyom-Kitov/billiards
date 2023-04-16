@@ -3,12 +3,15 @@ package ru.nsu.fit.akitov.billiards.utils;
 import java.io.*;
 import java.util.Properties;
 
-public record GameProperties(int fieldSize, float relativeBorderSize,
+public record GameProperties(int fieldSize, int upperPanelSize, float relativeBorderSize,
                              int ballsCount, int relativeBallSize, int relativePocketSize,
                              int relativeCueStrength, String gameName, String menuOption,
-                             String newGameOption, String exitOption) {
+                             String newGameOption, String aboutOption, String exitOption) {
+
   public static class Builder {
+
     private int fieldSize;
+    private int upperPanelSize;
     private float relativeBorderSize;
     private int ballsCount;
     private int relativeBallSize;
@@ -17,10 +20,16 @@ public record GameProperties(int fieldSize, float relativeBorderSize,
     private String gameName;
     private String menuOption;
     private String newGameOption;
+    private String aboutOption;
     private String exitOption;
 
     public Builder setFieldSize(int fieldSize) {
       this.fieldSize = fieldSize;
+      return this;
+    }
+
+    public Builder setUpperPanelSize(int upperPanelSize) {
+      this.upperPanelSize = upperPanelSize;
       return this;
     }
 
@@ -64,15 +73,20 @@ public record GameProperties(int fieldSize, float relativeBorderSize,
       return this;
     }
 
+    public Builder setAboutOption(String aboutOption) {
+      this.aboutOption = aboutOption;
+      return this;
+    }
+
     public Builder setExitOption(String exitOption) {
       this.exitOption = exitOption;
       return this;
     }
 
     public GameProperties build() {
-      return new GameProperties(fieldSize, relativeBorderSize, ballsCount,
+      return new GameProperties(fieldSize, upperPanelSize, relativeBorderSize, ballsCount,
               relativeBallSize, relativePocketSize, relativeCueStrength, gameName, menuOption,
-              newGameOption, exitOption);
+              newGameOption, aboutOption, exitOption);
     }
   }
 
@@ -83,6 +97,7 @@ public record GameProperties(int fieldSize, float relativeBorderSize,
 
     Builder builder = new Builder();
     builder.setFieldSize(Integer.parseUnsignedInt(properties.getProperty("FieldSize")))
+            .setUpperPanelSize(Integer.parseUnsignedInt(properties.getProperty("UpperPanelSize")))
             .setRelativeBorderSize(Float.parseFloat(properties.getProperty("RelativeBorderSize")))
             .setBallsCount(Integer.parseUnsignedInt(properties.getProperty("BallsCount")))
             .setRelativeBallSize(Integer.parseUnsignedInt(properties.getProperty("RelativeBallSize")))
@@ -91,6 +106,7 @@ public record GameProperties(int fieldSize, float relativeBorderSize,
             .setGameName(properties.getProperty("GameName"))
             .setMenuOption(properties.getProperty("MenuOption"))
             .setNewGameOption(properties.getProperty("NewGameOption"))
+            .setAboutOption(properties.getProperty("AboutOption"))
             .setExitOption(properties.getProperty("ExitOption"));
 
     return builder.build();

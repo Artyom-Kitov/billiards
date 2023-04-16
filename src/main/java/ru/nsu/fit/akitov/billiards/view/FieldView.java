@@ -7,7 +7,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FieldPanel extends JComponent {
+public class FieldView extends JComponent {
 
   private final Image background;
   private final List<Circle> balls;
@@ -16,14 +16,15 @@ public class FieldPanel extends JComponent {
   private final List<Circle> pockets;
   private final CueView cueView;
 
-  public FieldPanel(int width, int height, String path, int cueBallRadius) {
+  public FieldView(int width, int height, String path, int cueBallRadius) {
     setLayout(null);
+    this.setPreferredSize(new Dimension(width, height));
     background = Toolkit.getDefaultToolkit()
             .getImage(Thread.currentThread().getContextClassLoader().getResource(path))
             .getScaledInstance(width, height, Image.SCALE_DEFAULT);
     balls = new ArrayList<>();
     pockets = new ArrayList<>();
-    cueView = new CueView("cue.png", cueBallRadius);
+    cueView = new CueView(width / 2, height / 16, cueBallRadius);
     cueView.setVisible(false);
     this.setVisible(true);
   }
@@ -85,7 +86,6 @@ public class FieldPanel extends JComponent {
     for (Circle pocket : pockets) {
       pocket.paint(g);
     }
-    // CR: maybe draw even before new game
     if (cueBall != null) {
       cueBall.paint(g);
     }

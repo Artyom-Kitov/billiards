@@ -13,9 +13,12 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
 
   private final String menuOption;
   private final String newGameOption;
+  private final String aboutGameOption;
   private final String exitOption;
 
-  private final FieldPanel fieldPanel;
+  private final FieldView fieldView;
+  private final ClockView clockView;
+  private final int menuBarSize = 25;
 
   private ViewListener listener;
 
@@ -29,34 +32,43 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
         case KeyEvent.VK_UP -> listener.onUpPressed();
         case KeyEvent.VK_DOWN -> listener.onDownPressed();
       }
-      repaint();
     }
   };
 
   public BilliardsFrame(GameProperties properties) {
     super(properties.gameName());
 
-    int width = (int) (2 * properties.fieldSize() + 2 * properties.fieldSize() * properties.relativeBorderSize());
-    int height = (int) (properties.fieldSize() + 2 * properties.fieldSize() * properties.relativeBorderSize());
-    this.setPreferredSize(new Dimension(width, height));
+    int borderSize = (int) (properties.fieldSize() * properties.relativeBorderSize());
+    int width = 2 * properties.fieldSize() + 2 * borderSize;
+    int height = properties.fieldSize() + 2 * borderSize;
+
+    fieldView = new FieldView(width, height, "table.png", properties.fieldSize() / properties.relativeBallSize() / 2);
+    fieldView.setBorderSize(borderSize);
+    clockView = new ClockView(properties.upperPanelSize());
+    this.add(fieldView);
+    this.add(clockView);
+
+    this.setPreferredSize(new Dimension(width, height + 2 * menuBarSize + 3 + clockView.getHeight()));
     this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     this.setVisible(true);
-    this.setLayout(new BorderLayout());
     this.setResizable(false);
+    this.getContentPane().setBackground(Color.gray);
 
     menuOption = properties.menuOption();
     newGameOption = properties.newGameOption();
+    aboutGameOption = properties.aboutOption();
     exitOption = properties.exitOption();
 
-    fieldPanel = new FieldPanel(width, height, "table.png", properties.fieldSize() / properties.relativeBallSize() / 2);
-    fieldPanel.setBorderSize((int) (properties.fieldSize() * properties.relativeBorderSize()));
-    this.add(fieldPanel);
+    SpringLayout layout = new SpringLayout();
+    layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, clockView, 0, SpringLayout.HORIZONTAL_CENTER, getContentPane());
+    layout.putConstraint(SpringLayout.NORTH, fieldView, 0, SpringLayout.SOUTH, clockView);
 
     Image icon = Toolkit.getDefaultToolkit().getImage(
             Thread.currentThread().getContextClassLoader().getResource("logo.png")
     );
     this.setIconImage(icon);
 
+    this.setLayout(layout);
     setupMenu();
     pack();
   }
@@ -66,15 +78,19 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
     JMenu menu = new JMenu(menuOption);
 
     JMenuItem newGameItem = new JMenuItem(newGameOption);
+    JMenuItem aboutItem = new JMenuItem(aboutGameOption);
     JMenuItem exitItem = new JMenuItem(exitOption);
 
     newGameItem.addActionListener(event -> listener.newGame());
+    aboutItem.addActionListener(event -> AboutFrame.INSTANCE.setVisible(true));
     exitItem.addActionListener(event -> System.exit(0));
 
     menu.add(newGameItem);
+    menu.add(aboutItem);
     menu.add(exitItem);
     menuBar.add(menu);
 
+    menuBar.setPreferredSize(new Dimension(0, menuBarSize));
     this.setJMenuBar(menuBar);
   }
 
@@ -86,7 +102,7 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
 
   @Override
   public void clear() {
-    fieldPanel.clear();
+    fieldView.clear();
   }
 
   @Override
@@ -96,40 +112,46 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
 
   @Override
   public void addCueBall(int x, int y, int radius) {
-    fieldPanel.setCueBall(new Circle(radius, x, y, Color.darkGray));
+    fieldView.setCueBall(new Circle(radius, x, y, Color.darkGray));
   }
 
   @Override
   public void addBall(int x, int y, int radius) {
-    fieldPanel.addBall(new Circle(radius, x, y, Color.white));
+    fieldView.addBall(new Circle(radius, x, y, Color.white));
   }
 
   @Override
   public void addPocket(int x, int y, int radius) {
-    fieldPanel.addPocket(new Circle(radius, x, y, Color.black));
+    fieldView.addPocket(new Circle(radius, x, y, Color.black));
   }
 
   @Override
   public void updateBalls(Point2D cueBall, List<Point2D> balls) {
-    fieldPanel.updateBalls(cueBall, balls);
+    fieldView.updateBalls(cueBall, balls);
     repaint();
   }
 
   @Override
   public void updateCue(float velocity, float angle) {
-    fieldPanel.setCueVelocity(velocity);
-    fieldPanel.setCueAngle(angle);
-    fieldPanel.moveCue();
+    fieldView.setCueVelocity(velocity);
+    fieldView.setCueAngle(angle);
+    fieldView.moveCue();
+    repaint();
+  }
+
+  @Override
+  public void updateTime(int minutes, int seconds) {
+    clockView.setTime(minutes, seconds);
   }
 
   @Override
   public void removeBall(int index) {
-    fieldPanel.removeBall(index);
+    fieldView.removeBall(index);
   }
 
   @Override
   public void setCueAvailable(boolean b) {
-    fieldPanel.setCueVisible(b);
+    fieldView.setCueVisible(b);
     if (b) {
       this.addKeyListener(onKeyDown);
     } else {

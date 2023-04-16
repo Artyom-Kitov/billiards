@@ -17,13 +17,14 @@ public class CueView extends JComponent {
   private float velocity;
   private float angle;
 
-  public CueView(String path, int cueBallRadius) {
-    body = Toolkit.getDefaultToolkit().getImage(
-            Thread.currentThread().getContextClassLoader().getResource(path)
+  public CueView(int width, int height, int cueBallRadius) {
+    Image image = Toolkit.getDefaultToolkit().getImage(
+            Thread.currentThread().getContextClassLoader().getResource("cue.png")
     );
+    body = image.getScaledInstance(width, height, Image.SCALE_DEFAULT);
     this.cueBallRadius = cueBallRadius;
-    width = 756;
-    height = 45;
+    this.width = width;
+    this.height = height;
   }
 
   public void setPosition(int x, int y) {
@@ -48,7 +49,7 @@ public class CueView extends JComponent {
     Graphics2D g2d = (Graphics2D) g;
     int drawnX = (int) (x - cueBallRadius - DISPLAY_COEFFICIENT * velocity);
     int drawnY = y;
-    g2d.rotate(angle, x + width, y + height / 2);
+    g2d.rotate(angle, x + width, y + height / 2f);
     g2d.drawImage(body, drawnX, drawnY, this);
   }
 }

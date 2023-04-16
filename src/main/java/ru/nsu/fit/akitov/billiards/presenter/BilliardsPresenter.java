@@ -13,23 +13,29 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 public class BilliardsPresenter implements Runnable, FieldListener, ViewListener {
-  private static final float DELTA_VELOCITY = 50.0f;
-  private static final float DELTA_ANGLE = (float) Math.PI / 180.0f;
+  private static final float DELTA_VELOCITY = 50f;
+  private static final float DELTA_ANGLE = (float) Math.PI / 180f;
 
   private final BilliardsView view;
   private final Field field;
 
-  private final Timer timer;
+  private final Timer gameRunner;
+  private final Timer gameClock;
 
   public BilliardsPresenter(Field field, BilliardsView view) {
     this.field = field;
     this.view = view;
 
-    timer = new Timer(2, new ActionListener() {
+    gameRunner = new Timer(5, new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        field.update(timer.getDelay() * 0.001f);
+        field.update(gameRunner.getDelay() * 0.001f);
       }
+    });
+
+    gameClock = new Timer(1000, event -> {
+      field.tickClock();
+      view.updateTime(field.getMinutesElapsed(), field.getSecondsElapsed());
     });
   }
 
@@ -37,6 +43,7 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
   public void newGame() {
     field.reset();
     view.clear();
+    gameClock.restart();
 
     Ball cueBall = field.getCueBall();
     view.addCueBall((int) cueBall.getX(), (int) cueBall.getY(), (int) field.getBallRadius());
@@ -45,6 +52,7 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
       view.addBall(ball.x(), ball.y(), (int) field.getBallRadius());
     }
     view.setCueAvailable(true);
+    view.updateCue(field.getCueVelocity(), field.getCueAngle());
   }
 
   @Override
@@ -62,9 +70,11 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
 
   @Override
   public void onSpacePressed() {
+    if (field.getCueVelocity() == 0) {
+      return;
+    }
     field.performCueStrike();
     view.setCueAvailable(false);
-    timer.restart();
   }
 
   @Override
@@ -113,7 +123,7 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
 
   @Override
   public void isMotionless() {
-    timer.stop();
+    gameRunner.stop();
     view.setCueAvailable(true);
     view.updateCue(field.getCueVelocity(), field.getCueAngle());
   }
@@ -121,6 +131,6 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
   @Override
   public void strikePerformed() {
     view.setCueAvailable(false);
-    timer.start();
+    gameRunner.restart();
   }
 }
