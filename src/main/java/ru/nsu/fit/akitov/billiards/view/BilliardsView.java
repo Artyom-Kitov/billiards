@@ -8,11 +8,11 @@ public interface BilliardsView {
   void start();
   void clear();
   void attachListener(ViewListener listener);
-  void addCueBall(int x, int y, int radius);
   void addBall(int x, int y, int radius);
   void addPocket(int x, int y, int radius);
   void setCueAvailable(boolean b);
-  void updateBalls(Point2D cueBall, List<Point2D> balls);
+  void updateCueBall(int x, int y);
+  void updateBalls(List<Point2D> balls);
   void updateCue(float velocity, float angle);
   void updateTime(int minutes, int seconds);
   void removeBall(int index);

@@ -46,7 +46,7 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
     gameClock.restart();
 
     Ball cueBall = field.getCueBall();
-    view.addCueBall((int) cueBall.getX(), (int) cueBall.getY(), (int) field.getBallRadius());
+    view.updateCueBall((int) cueBall.getX(), (int) cueBall.getY());
     List<Point2D> balls = field.getBallsCoordinates();
     for (Point2D ball : balls) {
       view.addBall(ball.x(), ball.y(), (int) field.getBallRadius());
@@ -63,8 +63,6 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
     for (Point2D pocket : field.getPocketsCoordinates()) {
       view.addPocket(pocket.x(), pocket.y(), (int) field.getPocketRadius());
     }
-    Ball cueBall = field.getCueBall();
-    view.addCueBall((int) cueBall.getX(), (int) cueBall.getY(), (int) field.getBallRadius());
     view.start();
   }
 
@@ -103,7 +101,9 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
 
   @Override
   public void ballsMoved() {
-    view.updateBalls(getCueBallCoordinates(), field.getBallsCoordinates());
+    Point2D coordinates = getCueBallCoordinates();
+    view.updateCueBall(coordinates.x(), coordinates.y());
+    view.updateBalls(field.getBallsCoordinates());
   }
 
   @Override

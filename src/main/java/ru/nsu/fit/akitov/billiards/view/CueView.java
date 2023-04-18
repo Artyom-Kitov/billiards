@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class CueView extends JComponent {
-  private static final float DISPLAY_COEFFICIENT = 0.02f;
+  private static final float VELOCITY_DISPLAY_COEFFICIENT = 0.02f;
   private final Image body;
   private final int cueBallRadius;
 
@@ -47,7 +47,7 @@ public class CueView extends JComponent {
       return;
     }
     Graphics2D g2d = (Graphics2D) g;
-    int drawnX = (int) (x - cueBallRadius - DISPLAY_COEFFICIENT * velocity);
+    int drawnX = (int) (x - cueBallRadius - VELOCITY_DISPLAY_COEFFICIENT * velocity);
     int drawnY = y;
     g2d.rotate(angle, x + width, y + height / 2f);
     g2d.drawImage(body, drawnX, drawnY, this);

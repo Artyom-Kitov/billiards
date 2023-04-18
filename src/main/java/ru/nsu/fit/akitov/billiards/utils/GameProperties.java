@@ -90,7 +90,7 @@ public record GameProperties(int fieldSize, int upperPanelSize, float relativeBo
     }
   }
 
-  public static GameProperties readFromFile() throws IOException {
+  public static GameProperties readFromConfig() throws IOException {
     InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties");
     Properties properties = new Properties();
     properties.load(stream);

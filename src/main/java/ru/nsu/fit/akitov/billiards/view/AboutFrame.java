@@ -18,7 +18,7 @@ public class AboutFrame extends JFrame {
     text = "To be done...";
 
     this.setPreferredSize(new Dimension(512, 480));
-    this.setLayout(new SpringLayout());
+    this.setLayout(null);
     this.setResizable(false);
     this.pack();
     this.setVisible(true);

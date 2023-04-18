@@ -10,13 +10,13 @@ import java.util.List;
 public class FieldView extends JComponent {
 
   private final Image background;
-  private final List<Circle> balls;
+  private final List<BallView> balls;
   private int borderSize;
-  private Circle cueBall;
-  private final List<Circle> pockets;
+  private final BallView cueBall;
+  private final List<BallView> pockets;
   private final CueView cueView;
 
-  public FieldView(int width, int height, String path, int cueBallRadius) {
+  public FieldView(int width, int height, String path, BallView cueBall) {
     setLayout(null);
     this.setPreferredSize(new Dimension(width, height));
     background = Toolkit.getDefaultToolkit()
@@ -24,7 +24,8 @@ public class FieldView extends JComponent {
             .getScaledInstance(width, height, Image.SCALE_DEFAULT);
     balls = new ArrayList<>();
     pockets = new ArrayList<>();
-    cueView = new CueView(width / 2, height / 16, cueBallRadius);
+    this.cueBall = cueBall;
+    cueView = new CueView(width / 2, height / 16, cueBall.getRadius());
     cueView.setVisible(false);
     this.setVisible(true);
   }
@@ -33,14 +34,13 @@ public class FieldView extends JComponent {
     this.borderSize = borderSize;
   }
 
-  public void addBall(Circle ball) {
+  public void addBall(BallView ball) {
     ball.setLocation(ball.getX() + borderSize, ball.getY() + borderSize);
     balls.add(ball);
   }
 
-  public void setCueBall(Circle cueBall) {
-    cueBall.setLocation(cueBall.getX() + borderSize, cueBall.getY() + borderSize);
-    this.cueBall = cueBall;
+  public void setCueBallPosition(int x, int y) {
+    cueBall.setLocation(x + borderSize, y + borderSize);
   }
 
   public void setCueVelocity(float velocity) {
@@ -55,13 +55,12 @@ public class FieldView extends JComponent {
     cueView.setVisible(b);
   }
 
-  public void addPocket(Circle pocket) {
+  public void addPocket(BallView pocket) {
     pocket.setLocation(pocket.getX() + borderSize, pocket.getY() + borderSize);
     pockets.add(pocket);
   }
 
-  public void updateBalls(Point2D cueBall, List<Point2D> coordinates) {
-    this.cueBall.setLocation(cueBall.x() + borderSize, cueBall.y() + borderSize);
+  public void updateBalls(List<Point2D> coordinates) {
     for (int i = 0; i < coordinates.size(); i++) {
       this.balls.get(i).setLocation(coordinates.get(i).x() + borderSize, coordinates.get(i).y() + borderSize);
     }
@@ -83,13 +82,11 @@ public class FieldView extends JComponent {
   public void paint(Graphics g) {
     super.paint(g);
     g.drawImage(background, 0, 0, this);
-    for (Circle pocket : pockets) {
+    for (BallView pocket : pockets) {
       pocket.paint(g);
     }
-    if (cueBall != null) {
-      cueBall.paint(g);
-    }
-    for (Circle ball : balls) {
+    cueBall.paint(g);
+    for (BallView ball : balls) {
       ball.paint(g);
     }
     cueView.paint(g);

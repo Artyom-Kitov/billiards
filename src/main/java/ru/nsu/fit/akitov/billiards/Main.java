@@ -13,7 +13,7 @@ public class Main {
   public static void main(String[] args) {
     GameProperties props;
     try {
-      props = GameProperties.readFromFile();
+      props = GameProperties.readFromConfig();
     } catch (IOException e) {
       System.err.println(e.getMessage());
       return;

@@ -42,7 +42,8 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
     int width = 2 * properties.fieldSize() + 2 * borderSize;
     int height = properties.fieldSize() + 2 * borderSize;
 
-    fieldView = new FieldView(width, height, "table.png", properties.fieldSize() / properties.relativeBallSize() / 2);
+    int cueBallRadius = properties.fieldSize() / properties.relativeBallSize() / 2;
+    fieldView = new FieldView(width, height, "table.png", new BallView(cueBallRadius, -1000, -1000, Color.darkGray));
     fieldView.setBorderSize(borderSize);
     clockView = new ClockView(properties.upperPanelSize());
     this.add(fieldView);
@@ -111,23 +112,23 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
   }
 
   @Override
-  public void addCueBall(int x, int y, int radius) {
-    fieldView.setCueBall(new Circle(radius, x, y, Color.darkGray));
-  }
-
-  @Override
   public void addBall(int x, int y, int radius) {
-    fieldView.addBall(new Circle(radius, x, y, Color.white));
+    fieldView.addBall(new BallView(radius, x, y, Color.white));
   }
 
   @Override
   public void addPocket(int x, int y, int radius) {
-    fieldView.addPocket(new Circle(radius, x, y, Color.black));
+    fieldView.addPocket(new BallView(radius, x, y, Color.black));
   }
 
   @Override
-  public void updateBalls(Point2D cueBall, List<Point2D> balls) {
-    fieldView.updateBalls(cueBall, balls);
+  public void updateCueBall(int x, int y) {
+    fieldView.setCueBallPosition(x, y);
+  }
+
+  @Override
+  public void updateBalls(List<Point2D> balls) {
+    fieldView.updateBalls(balls);
     repaint();
   }
 
