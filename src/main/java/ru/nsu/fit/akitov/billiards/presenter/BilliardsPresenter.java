@@ -13,6 +13,7 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 public class BilliardsPresenter implements Runnable, FieldListener, ViewListener {
+
   private static final float DELTA_VELOCITY = 50f;
   private static final float DELTA_ANGLE = (float) Math.PI / 180f;
 

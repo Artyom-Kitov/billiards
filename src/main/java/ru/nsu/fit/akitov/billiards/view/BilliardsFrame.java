@@ -43,7 +43,7 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
     int height = properties.fieldSize() + 2 * borderSize;
 
     int cueBallRadius = properties.fieldSize() / properties.relativeBallSize() / 2;
-    fieldView = new FieldView(width, height, "table.png", new BallView(cueBallRadius, -1000, -1000, Color.darkGray));
+    fieldView = new FieldView(width, height, "/table.png", new BallView(cueBallRadius, -1000, -1000, Color.darkGray));
     fieldView.setBorderSize(borderSize);
     clockView = new ClockView(properties.upperPanelSize());
     this.add(fieldView);
@@ -64,9 +64,7 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
     layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, clockView, 0, SpringLayout.HORIZONTAL_CENTER, getContentPane());
     layout.putConstraint(SpringLayout.NORTH, fieldView, 0, SpringLayout.SOUTH, clockView);
 
-    Image icon = Toolkit.getDefaultToolkit().getImage(
-            Thread.currentThread().getContextClassLoader().getResource("logo.png")
-    );
+    Image icon = Toolkit.getDefaultToolkit().getImage(BilliardsFrame.class.getResource("/logo.png"));
     this.setIconImage(icon);
 
     this.setLayout(layout);

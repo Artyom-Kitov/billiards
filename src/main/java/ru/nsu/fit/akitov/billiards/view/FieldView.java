@@ -20,7 +20,7 @@ public class FieldView extends JComponent {
     setLayout(null);
     this.setPreferredSize(new Dimension(width, height));
     background = Toolkit.getDefaultToolkit()
-            .getImage(Thread.currentThread().getContextClassLoader().getResource(path))
+            .getImage(FieldView.class.getResource(path))
             .getScaledInstance(width, height, Image.SCALE_DEFAULT);
     balls = new ArrayList<>();
     pockets = new ArrayList<>();
@@ -80,7 +80,6 @@ public class FieldView extends JComponent {
 
   @Override
   public void paint(Graphics g) {
-    super.paint(g);
     g.drawImage(background, 0, 0, this);
     for (BallView pocket : pockets) {
       pocket.paint(g);
@@ -90,5 +89,6 @@ public class FieldView extends JComponent {
       ball.paint(g);
     }
     cueView.paint(g);
+    super.paint(g);
   }
 }

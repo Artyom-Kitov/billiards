@@ -6,18 +6,10 @@ import ru.nsu.fit.akitov.billiards.utils.GameProperties;
 import ru.nsu.fit.akitov.billiards.view.BilliardsFrame;
 import ru.nsu.fit.akitov.billiards.view.BilliardsView;
 
-import java.io.IOException;
-
 public class Main {
 
   public static void main(String[] args) {
-    GameProperties props;
-    try {
-      props = GameProperties.readFromConfig();
-    } catch (IOException e) {
-      System.err.println(e.getMessage());
-      return;
-    }
+    GameProperties props = GameProperties.readFromConfig();
 
     Field field = new Field(props);
     BilliardsView view = new BilliardsFrame(props);

@@ -18,9 +18,7 @@ public class CueView extends JComponent {
   private float angle;
 
   public CueView(int width, int height, int cueBallRadius) {
-    Image image = Toolkit.getDefaultToolkit().getImage(
-            Thread.currentThread().getContextClassLoader().getResource("cue.png")
-    );
+    Image image = Toolkit.getDefaultToolkit().getImage(CueView.class.getResource("/cue.png"));
     body = image.getScaledInstance(width, height, Image.SCALE_DEFAULT);
     this.cueBallRadius = cueBallRadius;
     this.width = width;

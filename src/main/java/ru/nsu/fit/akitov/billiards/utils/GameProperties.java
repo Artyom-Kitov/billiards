@@ -10,18 +10,18 @@ public record GameProperties(int fieldSize, int upperPanelSize, float relativeBo
 
   public static class Builder {
 
-    private int fieldSize;
-    private int upperPanelSize;
-    private float relativeBorderSize;
-    private int ballsCount;
-    private int relativeBallSize;
-    private int relativePocketSize;
-    private int relativeCueStrength;
-    private String gameName;
-    private String menuOption;
-    private String newGameOption;
-    private String aboutOption;
-    private String exitOption;
+    private int fieldSize = 500;
+    private int upperPanelSize = 50;
+    private float relativeBorderSize = 0.066f;
+    private int ballsCount = 15;
+    private int relativeBallSize = 14;
+    private int relativePocketSize = 8;
+    private int relativeCueStrength = 4;
+    private String gameName = "Billiards";
+    private String menuOption = "Menu";
+    private String newGameOption = "New Game";
+    private String aboutOption = "About";
+    private String exitOption = "Exit";
 
     public Builder setFieldSize(int fieldSize) {
       this.fieldSize = fieldSize;
@@ -59,26 +59,41 @@ public record GameProperties(int fieldSize, int upperPanelSize, float relativeBo
     }
 
     public Builder setGameName(String gameName) {
+      if (gameName == null) {
+        throw new NullPointerException("game name cannot be null");
+      }
       this.gameName = gameName;
       return this;
     }
 
     public Builder setMenuOption(String menuOption) {
+      if (menuOption == null) {
+        throw new NullPointerException("menu option name cannot be null");
+      }
       this.menuOption = menuOption;
       return this;
     }
 
     public Builder setNewGameOption(String newGameOption) {
+      if (newGameOption == null) {
+        throw new NullPointerException("new game option name cannot be null");
+      }
       this.newGameOption = newGameOption;
       return this;
     }
 
     public Builder setAboutOption(String aboutOption) {
+      if (aboutOption == null) {
+        throw new NullPointerException("about option name cannot be null");
+      }
       this.aboutOption = aboutOption;
       return this;
     }
 
     public Builder setExitOption(String exitOption) {
+      if (exitOption == null) {
+        throw new NullPointerException("exit option name cannot be null");
+      }
       this.exitOption = exitOption;
       return this;
     }
@@ -90,25 +105,28 @@ public record GameProperties(int fieldSize, int upperPanelSize, float relativeBo
     }
   }
 
-  public static GameProperties readFromConfig() throws IOException {
-    InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties");
-    Properties properties = new Properties();
-    properties.load(stream);
+  public static GameProperties readFromConfig() {
+    try {
+      InputStream stream = GameProperties.class.getResourceAsStream("/config.properties");
+      Properties properties = new Properties();
+      properties.load(stream);
 
-    Builder builder = new Builder();
-    builder.setFieldSize(Integer.parseUnsignedInt(properties.getProperty("FieldSize")))
-            .setUpperPanelSize(Integer.parseUnsignedInt(properties.getProperty("UpperPanelSize")))
-            .setRelativeBorderSize(Float.parseFloat(properties.getProperty("RelativeBorderSize")))
-            .setBallsCount(Integer.parseUnsignedInt(properties.getProperty("BallsCount")))
-            .setRelativeBallSize(Integer.parseUnsignedInt(properties.getProperty("RelativeBallSize")))
-            .setRelativePocketSize(Integer.parseUnsignedInt(properties.getProperty("RelativePocketSize")))
-            .setRelativeCueStrength(Integer.parseUnsignedInt(properties.getProperty("RelativeCueStrength")))
-            .setGameName(properties.getProperty("GameName"))
-            .setMenuOption(properties.getProperty("MenuOption"))
-            .setNewGameOption(properties.getProperty("NewGameOption"))
-            .setAboutOption(properties.getProperty("AboutOption"))
-            .setExitOption(properties.getProperty("ExitOption"));
-
-    return builder.build();
+      Builder builder = new Builder();
+      builder.setFieldSize(Integer.parseUnsignedInt(properties.getProperty("FieldSize")))
+              .setUpperPanelSize(Integer.parseUnsignedInt(properties.getProperty("UpperPanelSize")))
+              .setRelativeBorderSize(Float.parseFloat(properties.getProperty("RelativeBorderSize")))
+              .setBallsCount(Integer.parseUnsignedInt(properties.getProperty("BallsCount")))
+              .setRelativeBallSize(Integer.parseUnsignedInt(properties.getProperty("RelativeBallSize")))
+              .setRelativePocketSize(Integer.parseUnsignedInt(properties.getProperty("RelativePocketSize")))
+              .setRelativeCueStrength(Integer.parseUnsignedInt(properties.getProperty("RelativeCueStrength")))
+              .setGameName(properties.getProperty("GameName"))
+              .setMenuOption(properties.getProperty("MenuOption"))
+              .setNewGameOption(properties.getProperty("NewGameOption"))
+              .setAboutOption(properties.getProperty("AboutOption"))
+              .setExitOption(properties.getProperty("ExitOption"));
+      return builder.build();
+    } catch (IOException | NumberFormatException | NullPointerException e) {
+      return new Builder().build();
+    }
   }
 }
