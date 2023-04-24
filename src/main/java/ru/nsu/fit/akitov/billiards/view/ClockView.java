@@ -1,5 +1,7 @@
 package ru.nsu.fit.akitov.billiards.view;
 
+import ru.nsu.fit.akitov.billiards.utils.ClockTime;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -12,8 +14,7 @@ public class ClockView extends JLabel {
     this.setFont(new Font("Serif", Font.PLAIN, height));
   }
 
-  public void setTime(int minutes, int seconds) {
-
-    this.setText(minutes % 100 + ":" + seconds);
+  public void setTime(ClockTime time) {
+    this.setText(time.toString());
   }
 }

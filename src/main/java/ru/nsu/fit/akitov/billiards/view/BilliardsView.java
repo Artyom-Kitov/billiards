@@ -1,5 +1,6 @@
 package ru.nsu.fit.akitov.billiards.view;
 
+import ru.nsu.fit.akitov.billiards.utils.ClockTime;
 import ru.nsu.fit.akitov.billiards.utils.Point2D;
 
 import java.util.List;
@@ -14,6 +15,6 @@ public interface BilliardsView {
   void updateCueBall(int x, int y);
   void updateBalls(List<Point2D> balls);
   void updateCue(float velocity, float angle);
-  void updateTime(int minutes, int seconds);
+  void updateTime(ClockTime time);
   void removeBall(int index);
 }

@@ -36,7 +36,7 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
 
     gameClock = new Timer(1000, event -> {
       field.tickClock();
-      view.updateTime(field.getMinutesElapsed(), field.getSecondsElapsed());
+      view.updateTime(field.getElapsedTime());
     });
   }
 

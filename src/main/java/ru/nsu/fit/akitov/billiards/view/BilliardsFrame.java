@@ -1,5 +1,6 @@
 package ru.nsu.fit.akitov.billiards.view;
 
+import ru.nsu.fit.akitov.billiards.utils.ClockTime;
 import ru.nsu.fit.akitov.billiards.utils.GameProperties;
 import ru.nsu.fit.akitov.billiards.utils.Point2D;
 
@@ -43,7 +44,7 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
     int height = properties.fieldSize() + 2 * borderSize;
 
     int cueBallRadius = properties.fieldSize() / properties.relativeBallSize() / 2;
-    fieldView = new FieldView(width, height, "/table.png", new BallView(cueBallRadius, -1000, -1000, Color.darkGray));
+    fieldView = new FieldView(width, height, "/field.png", new BallView(cueBallRadius, -1000, -1000, Color.darkGray));
     fieldView.setBorderSize(borderSize);
     clockView = new ClockView(properties.upperPanelSize());
     this.add(fieldView);
@@ -139,8 +140,8 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
   }
 
   @Override
-  public void updateTime(int minutes, int seconds) {
-    clockView.setTime(minutes, seconds);
+  public void updateTime(ClockTime time) {
+    clockView.setTime(time);
   }
 
   @Override

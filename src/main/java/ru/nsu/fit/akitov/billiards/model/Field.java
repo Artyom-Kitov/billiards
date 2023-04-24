@@ -1,5 +1,6 @@
 package ru.nsu.fit.akitov.billiards.model;
 
+import ru.nsu.fit.akitov.billiards.utils.ClockTime;
 import ru.nsu.fit.akitov.billiards.utils.GameProperties;
 import ru.nsu.fit.akitov.billiards.utils.Point2D;
 
@@ -202,11 +203,7 @@ public class Field {
     clock.tick();
   }
 
-  public int getMinutesElapsed() {
-    return clock.getMinutes();
-  }
-
-  public int getSecondsElapsed() {
-    return clock.getSeconds();
+  public ClockTime getElapsedTime() {
+    return clock.getTime();
   }
 }

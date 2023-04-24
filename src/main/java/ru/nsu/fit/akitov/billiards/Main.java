@@ -10,7 +10,6 @@ public class Main {
 
   public static void main(String[] args) {
     GameProperties props = GameProperties.readFromConfig();
-
     Field field = new Field(props);
     BilliardsView view = new BilliardsFrame(props);
     BilliardsPresenter presenter = new BilliardsPresenter(field, view);

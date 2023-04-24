@@ -1,6 +1,9 @@
 package ru.nsu.fit.akitov.billiards.model;
 
+import ru.nsu.fit.akitov.billiards.utils.ClockTime;
+
 public class Clock {
+
   private int minutes;
   private int seconds;
 
@@ -15,11 +18,7 @@ public class Clock {
     seconds %= 60;
   }
 
-  public int getMinutes() {
-    return minutes;
-  }
-
-  public int getSeconds() {
-    return seconds;
+  public ClockTime getTime() {
+    return new ClockTime(minutes, seconds);
   }
 }
