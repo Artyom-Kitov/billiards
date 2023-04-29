@@ -12,9 +12,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
+// CR: add game end
+// CR: add records
 public class BilliardsPresenter implements Runnable, FieldListener, ViewListener {
 
+  // CR: model detail
   private static final float DELTA_VELOCITY = 50f;
+  // CR: model detail
   private static final float DELTA_ANGLE = (float) Math.PI / 180f;
 
   private final BilliardsView view;
@@ -30,6 +34,7 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
     gameRunner = new Timer(5, new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
+        // CR: 0.001f is definitely a model detail
         field.update(gameRunner.getDelay() * 0.001f);
       }
     });
@@ -46,6 +51,12 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
     view.clear();
     gameClock.restart();
 
+    // CR: imo it would be better to have some dto (data transfer objects) that would contain info from
+    // CR: model that view needs
+    // CR: e.g.
+    // record GameModel(List<BallModel> balls, CueModel cue) {}
+    // record BallModel(Point2D pos, int radius) {}
+    // record CueModel(Point2D pos, float velocity, float angle)
     Ball cueBall = field.getCueBall();
     view.updateCueBall((int) cueBall.getX(), (int) cueBall.getY());
     List<Point2D> balls = field.getBallsCoordinates();
@@ -61,6 +72,7 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
     view.attachListener(this);
     field.setListener(this);
     field.reset();
+    // CR: same as in newGame
     for (Point2D pocket : field.getPocketsCoordinates()) {
       view.addPocket(pocket.x(), pocket.y(), (int) field.getPocketRadius());
     }
@@ -115,7 +127,7 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
 
   @Override
   public void cueBallInPocket() {
-
+    // CR: do we need this?
   }
 
   private Point2D getCueBallCoordinates() {

@@ -5,9 +5,24 @@ import java.util.Properties;
 
 public record GameProperties(int fieldSize, int upperPanelSize, float relativeBorderSize,
                              int ballsCount, int relativeBallSize, int relativePocketSize,
-                             int relativeCueStrength, String gameName, String menuOption,
+                             int relativeCueStrength,
+                             // CR: ok to hardcode all view fields
+                             // CR: or you can do the following:
+                             // interface ModelProperties {
+                             //   int fieldSize();
+                             // }
+                             //
+                             // interface ViewProperties {
+                             //   String gameName();
+                             //   // etc...
+                             // }
+                             //
+                             // record GameProperties implements ModelProperties, ViewProperties {}
+                             String gameName, String menuOption,
                              String newGameOption, String aboutOption, String exitOption) {
 
+  // CR: take a look at https://projectlombok.org/features/Builder since you've liked this pattern :)
+  // CR: not sure if it would be suitable here
   public static class Builder {
 
     private int fieldSize = 500;

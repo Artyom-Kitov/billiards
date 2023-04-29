@@ -73,6 +73,8 @@ public class Field {
     float x0 = sizeX / 4f * 3f;
     float y0 = sizeY / 2;
     float dr = 2 * ballRadius;
+    // CR: we can pass start positions of everything into our model constructor
+    // CR: this way it would be easier to write tests for model (pass initial positions and then invoke
     for (int i = 1; drawn != properties.ballsCount(); i++) {
       for (int j = 0; j < i && drawn != properties.ballsCount(); j++) {
         balls.add(new Ball(x0 + dr * (i - 1), y0 - dr * (i / 2)

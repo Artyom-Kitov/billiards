@@ -18,6 +18,7 @@ public record ClockTime(int minutes, int seconds) implements Comparable<ClockTim
     return Comparator.comparingInt(ClockTime::minutes).thenComparingInt(ClockTime::seconds).compare(this, o);
   }
 
+  // CR: redundant? default impl seems to be suitable
   @Override
   public boolean equals(Object o) {
     if (this == o) {
