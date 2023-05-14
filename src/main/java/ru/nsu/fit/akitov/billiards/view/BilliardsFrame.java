@@ -1,8 +1,6 @@
 package ru.nsu.fit.akitov.billiards.view;
 
-import ru.nsu.fit.akitov.billiards.utils.ClockTime;
-import ru.nsu.fit.akitov.billiards.utils.GameProperties;
-import ru.nsu.fit.akitov.billiards.utils.Point2D;
+import ru.nsu.fit.akitov.billiards.utils.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -42,9 +40,9 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
     int borderSize = (int) (properties.fieldSize() * properties.relativeBorderSize());
     int width = 2 * properties.fieldSize() + 2 * borderSize;
     int height = properties.fieldSize() + 2 * borderSize;
+    int ballRadius = (int) (properties.fieldSize() * properties.relativeBallSize());
 
-    int cueBallRadius = properties.fieldSize() / properties.relativeBallSize() / 2;
-    fieldView = new FieldView(width, height, "/field.png", new BallView(cueBallRadius, -1000, -1000, Color.darkGray));
+    fieldView = new FieldView(width, height, ballRadius, "/field.png");
     fieldView.setBorderSize(borderSize);
     clockView = new ClockView(properties.upperPanelSize());
     this.add(fieldView);
@@ -69,8 +67,8 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
     this.setIconImage(icon);
 
     this.setLayout(layout);
-    setupMenu();
-    pack();
+    this.setupMenu();
+    this.pack();
   }
 
   private void setupMenu() {
@@ -103,6 +101,7 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
   @Override
   public void clear() {
     fieldView.clear();
+    clockView.setTime(new ClockTime(0, 0));
   }
 
   @Override
@@ -111,30 +110,36 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
   }
 
   @Override
-  public void addBall(int x, int y, int radius) {
-    fieldView.addBall(new BallView(radius, x, y, Color.white));
+  public void addBall(BallModel ball) {
+    fieldView.addBall(new BallView(ball.radius(), (int) ball.position().x(), (int) ball.position().y(), Color.white));
   }
 
   @Override
-  public void addPocket(int x, int y, int radius) {
-    fieldView.addPocket(new BallView(radius, x, y, Color.black));
+  public void addCueBall(BallModel cueBall) {
+    fieldView.addCueBall(cueBall);
+    updateCueBall(cueBall);
   }
 
   @Override
-  public void updateCueBall(int x, int y) {
-    fieldView.setCueBallPosition(x, y);
+  public void addPocket(PocketModel pocket) {
+    fieldView.addPocket(new PocketView(pocket.radius(), (int) pocket.position().x(), (int) pocket.position().y()));
   }
 
   @Override
-  public void updateBalls(List<Point2D> balls) {
+  public void updateCueBall(BallModel cueBall) {
+    fieldView.setCueBallPosition((int) cueBall.position().x(), (int) cueBall.position().y());
+  }
+
+  @Override
+  public void updateBalls(List<BallModel> balls) {
     fieldView.updateBalls(balls);
     repaint();
   }
 
   @Override
-  public void updateCue(float velocity, float angle) {
-    fieldView.setCueVelocity(velocity);
-    fieldView.setCueAngle(angle);
+  public void updateCue(CueModel cue) {
+    fieldView.setCueVelocity(cue.velocity());
+    fieldView.setCueAngle(cue.angle());
     fieldView.moveCue();
     repaint();
   }

@@ -39,8 +39,7 @@ public class CueView extends JComponent {
   }
 
   @Override
-  public void paint(Graphics g) {
-    super.paint(g);
+  public void paintComponent(Graphics g) {
     if (!isVisible()) {
       return;
     }

@@ -1,5 +1,7 @@
 package ru.nsu.fit.akitov.billiards.model;
 
+import ru.nsu.fit.akitov.billiards.utils.Point2D;
+
 public class Ball {
 
   private static final float COMPARE_PRECISION = 1f;
@@ -40,6 +42,10 @@ public class Ball {
 
   public float getY() {
     return y;
+  }
+
+  public Point2D getPosition() {
+    return new Point2D(x, y);
   }
 
   public float getVelocityX() {
@@ -92,6 +98,21 @@ public class Ball {
 
     other.x = x + (radius + other.radius) * cos;
     other.y = y + (radius + other.radius) * sin;
+  }
+
+  public void unhookFromWalls(float left, float right, float lower, float upper) {
+    if (x - radius < left) {
+      x = left;
+    }
+    if (x + radius > right) {
+      x = right;
+    }
+    if (y - radius < lower) {
+      y = lower;
+    }
+    if (y + radius > upper) {
+      y = upper;
+    }
   }
 
   public boolean isInPocket(Pocket pocket) {

@@ -1,9 +1,9 @@
 package ru.nsu.fit.akitov.billiards.presenter;
 
-import ru.nsu.fit.akitov.billiards.model.Ball;
 import ru.nsu.fit.akitov.billiards.model.Field;
 import ru.nsu.fit.akitov.billiards.model.FieldListener;
-import ru.nsu.fit.akitov.billiards.utils.Point2D;
+import ru.nsu.fit.akitov.billiards.utils.BallModel;
+import ru.nsu.fit.akitov.billiards.utils.PocketModel;
 import ru.nsu.fit.akitov.billiards.view.BilliardsView;
 import ru.nsu.fit.akitov.billiards.view.ViewListener;
 
@@ -15,11 +15,6 @@ import java.util.List;
 // CR: add game end
 // CR: add records
 public class BilliardsPresenter implements Runnable, FieldListener, ViewListener {
-
-  // CR: model detail
-  private static final float DELTA_VELOCITY = 50f;
-  // CR: model detail
-  private static final float DELTA_ANGLE = (float) Math.PI / 180f;
 
   private final BilliardsView view;
   private final Field field;
@@ -33,9 +28,8 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
 
     gameRunner = new Timer(5, new ActionListener() {
       @Override
-      public void actionPerformed(ActionEvent e) {
-        // CR: 0.001f is definitely a model detail
-        field.update(gameRunner.getDelay() * 0.001f);
+      public void actionPerformed(ActionEvent event) {
+        field.update(gameRunner.getDelay());
       }
     });
 
@@ -43,6 +37,8 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
       field.tickClock();
       view.updateTime(field.getElapsedTime());
     });
+
+    newGame();
   }
 
   @Override
@@ -51,20 +47,13 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
     view.clear();
     gameClock.restart();
 
-    // CR: imo it would be better to have some dto (data transfer objects) that would contain info from
-    // CR: model that view needs
-    // CR: e.g.
-    // record GameModel(List<BallModel> balls, CueModel cue) {}
-    // record BallModel(Point2D pos, int radius) {}
-    // record CueModel(Point2D pos, float velocity, float angle)
-    Ball cueBall = field.getCueBall();
-    view.updateCueBall((int) cueBall.getX(), (int) cueBall.getY());
-    List<Point2D> balls = field.getBallsCoordinates();
-    for (Point2D ball : balls) {
-      view.addBall(ball.x(), ball.y(), (int) field.getBallRadius());
+    view.addCueBall(field.getCueBall());
+    List<BallModel> balls = field.getBalls();
+    for (BallModel ball : balls) {
+      view.addBall(ball);
     }
+//    view.setCue();
     view.setCueAvailable(true);
-    view.updateCue(field.getCueVelocity(), field.getCueAngle());
   }
 
   @Override
@@ -72,16 +61,15 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
     view.attachListener(this);
     field.setListener(this);
     field.reset();
-    // CR: same as in newGame
-    for (Point2D pocket : field.getPocketsCoordinates()) {
-      view.addPocket(pocket.x(), pocket.y(), (int) field.getPocketRadius());
+    for (PocketModel pocket : field.getPockets()) {
+      view.addPocket(pocket);
     }
     view.start();
   }
 
   @Override
   public void onSpacePressed() {
-    if (field.getCueVelocity() == 0) {
+    if (field.getCue().velocity() == 0) {
       return;
     }
     field.performCueStrike();
@@ -90,33 +78,32 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
 
   @Override
   public void onLeftPressed() {
-    field.rotateCue(DELTA_ANGLE);
-    view.updateCue(field.getCueVelocity(), field.getCueAngle());
+    field.rotateCueLeft();
+    view.updateCue(field.getCue());
   }
 
   @Override
   public void onRightPressed() {
-    field.rotateCue(-DELTA_ANGLE);
-    view.updateCue(field.getCueVelocity(), field.getCueAngle());
+    field.rotateCueRight();
+    view.updateCue(field.getCue());
   }
 
   @Override
   public void onUpPressed() {
-    field.addCueVelocity(-DELTA_VELOCITY);
-    view.updateCue(field.getCueVelocity(), field.getCueAngle());
+    field.reduceCueVelocity();
+    view.updateCue(field.getCue());
   }
 
   @Override
   public void onDownPressed() {
-    field.addCueVelocity(DELTA_VELOCITY);
-    view.updateCue(field.getCueVelocity(), field.getCueAngle());
+    field.increaseCueVelocity();
+    view.updateCue(field.getCue());
   }
 
   @Override
   public void ballsMoved() {
-    Point2D coordinates = getCueBallCoordinates();
-    view.updateCueBall(coordinates.x(), coordinates.y());
-    view.updateBalls(field.getBallsCoordinates());
+    view.updateCueBall(field.getCueBall());
+    view.updateBalls(field.getBalls());
   }
 
   @Override
@@ -130,15 +117,11 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
     // CR: do we need this?
   }
 
-  private Point2D getCueBallCoordinates() {
-    return new Point2D((int) field.getCueBall().getX(), (int) field.getCueBall().getY());
-  }
-
   @Override
   public void isMotionless() {
     gameRunner.stop();
     view.setCueAvailable(true);
-    view.updateCue(field.getCueVelocity(), field.getCueAngle());
+    view.updateCue(field.getCue());
   }
 
   @Override

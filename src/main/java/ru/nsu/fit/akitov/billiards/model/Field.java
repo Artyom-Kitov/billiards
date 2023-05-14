@@ -1,21 +1,22 @@
 package ru.nsu.fit.akitov.billiards.model;
 
-import ru.nsu.fit.akitov.billiards.utils.ClockTime;
-import ru.nsu.fit.akitov.billiards.utils.GameProperties;
-import ru.nsu.fit.akitov.billiards.utils.Point2D;
+import ru.nsu.fit.akitov.billiards.utils.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Field {
 
-  private final GameProperties properties;
-
   private static final float SURFACE_FRICTION = 40;
   private static final float GRAVITY = 10;
 
+  private static final float DELTA_VELOCITY = 50f;
+  private static final float DELTA_ANGLE = (float) Math.PI / 180f;
+
   private final float sizeX;
   private final float sizeY;
+
+  private final List<Point2D> startCoordinates;
 
   private final float ballRadius;
   private final List<Ball> balls;
@@ -33,9 +34,9 @@ public class Field {
   public Field(GameProperties properties) {
     this.sizeX = properties.fieldSize() * 2;
     this.sizeY = properties.fieldSize();
-    this.ballRadius = (float) properties.fieldSize() / properties.relativeBallSize() / 2;
+    this.startCoordinates = properties.ballsCoordinates();
+    this.ballRadius = properties.relativeBallSize() * properties.fieldSize();
     this.pocketRadius = (float) properties.fieldSize() / properties.relativePocketSize() / 2;
-    this.properties = properties;
 
     balls = new ArrayList<>();
     pockets = new ArrayList<>();
@@ -48,16 +49,8 @@ public class Field {
     clock = new Clock();
     reset();
   }
-  public Ball getCueBall() {
-    return cueBall;
-  }
-
-  public float getBallRadius() {
-    return ballRadius;
-  }
-
-  public float getPocketRadius() {
-    return pocketRadius;
+  public BallModel getCueBall() {
+    return new BallModel(cueBall.getPosition(), (int) ballRadius);
   }
 
   public void setListener(FieldListener listener) {
@@ -67,20 +60,13 @@ public class Field {
   public void reset() {
     balls.clear();
     clock.reset();
-    cueBall = new Ball(sizeX / 4, sizeY / 2, ballRadius);
 
-    int drawn = 0;
-    float x0 = sizeX / 4f * 3f;
-    float y0 = sizeY / 2;
-    float dr = 2 * ballRadius;
-    // CR: we can pass start positions of everything into our model constructor
-    // CR: this way it would be easier to write tests for model (pass initial positions and then invoke
-    for (int i = 1; drawn != properties.ballsCount(); i++) {
-      for (int j = 0; j < i && drawn != properties.ballsCount(); j++) {
-        balls.add(new Ball(x0 + dr * (i - 1), y0 - dr * (i / 2)
-                + ((i + 1) % 2) * ballRadius + dr * j, ballRadius));
-        drawn++;
-      }
+    Point2D startCueBall = startCoordinates.get(0);
+    cueBall = new Ball(startCueBall.x() * ballRadius, startCueBall.y() * ballRadius, ballRadius);
+
+    for (int i = 1; i < startCoordinates.size(); i++) {
+      Point2D position = startCoordinates.get(i);
+      balls.add(new Ball(position.x() * ballRadius, position.y() * ballRadius, ballRadius));
     }
   }
 
@@ -100,15 +86,15 @@ public class Field {
     return true;
   }
 
-  public List<Point2D> getBallsCoordinates() {
+  public List<BallModel> getBalls() {
     return balls.stream()
-            .map(ball -> new Point2D((int) ball.getX(), (int) ball.getY()))
+            .map(ball -> new BallModel(ball.getPosition(), (int) ballRadius))
             .toList();
   }
 
-  public List<Point2D> getPocketsCoordinates() {
+  public List<PocketModel> getPockets() {
     return pockets.stream()
-            .map(pocket -> new Point2D((int) pocket.x(), (int) pocket.y()))
+            .map(pocket -> new PocketModel(new Point2D(pocket.x(), pocket.y()), (int) pocketRadius))
             .toList();
   }
 
@@ -137,6 +123,7 @@ public class Field {
       if (cueBall.collides(ball)) {
         cueBall.hit(ball);
         cueBall.unhookFrom(ball);
+        cueBall.unhookFromWalls(0, sizeX, 0, sizeY);
       }
     }
     for (int i = 0; i < balls.size(); i++) {
@@ -146,6 +133,7 @@ public class Field {
         }
         balls.get(i).hit(balls.get(j));
         balls.get(i).unhookFrom(balls.get(j));
+        balls.get(i).unhookFromWalls(0, sizeX, 0, sizeY);
       }
     }
   }
@@ -169,31 +157,35 @@ public class Field {
     }
   }
 
-  public void update(float dt) {
+  public void update(float milliseconds) {
     if (isMotionless()) {
       listener.isMotionless();
       return;
     }
-    move(dt);
+    move(milliseconds * 0.001f);
     updateVelocities();
     checkPockets();
     listener.ballsMoved();
   }
 
-  public void addCueVelocity(float dv) {
-    cue.addVelocity(dv);
+  public void increaseCueVelocity() {
+    cue.addVelocity(DELTA_VELOCITY);
   }
 
-  public void rotateCue(float theta) {
-    cue.rotate(theta);
+  public void reduceCueVelocity() {
+    cue.addVelocity(-DELTA_VELOCITY);
   }
 
-  public float getCueVelocity() {
-    return cue.getVelocity();
+  public void rotateCueLeft() {
+    cue.rotate(DELTA_ANGLE);
   }
 
-  public float getCueAngle() {
-    return cue.getAngle();
+  public void rotateCueRight() {
+    cue.rotate(-DELTA_ANGLE);
+  }
+
+  public CueModel getCue() {
+    return new CueModel(cue.getVelocity(), cue.getAngle());
   }
 
   public void performCueStrike() {
