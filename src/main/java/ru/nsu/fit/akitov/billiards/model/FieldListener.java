@@ -5,4 +5,5 @@ public interface FieldListener {
   void isMotionless();
   void strikePerformed();
   void askForCueBall();
+  void cueBallPlaceSuccessful();
 }

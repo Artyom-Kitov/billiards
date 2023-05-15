@@ -23,13 +23,26 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
 
   private final KeyAdapter onKeyDown = new KeyAdapter() {
     @Override
-    public void keyPressed(KeyEvent e) {
-      switch (e.getKeyCode()) {
+    public void keyPressed(KeyEvent event) {
+      switch (event.getKeyCode()) {
         case KeyEvent.VK_SPACE -> listener.cueStrike();
         case KeyEvent.VK_LEFT -> listener.rotateCueLeft();
         case KeyEvent.VK_RIGHT -> listener.rotateCueRight();
         case KeyEvent.VK_UP -> listener.reduceCueVelocity();
         case KeyEvent.VK_DOWN -> listener.increaseCueVelocity();
+      }
+    }
+  };
+
+  private final KeyAdapter cueBallPlacer  = new KeyAdapter() {
+    @Override
+    public void keyPressed(KeyEvent event) {
+      switch (event.getKeyCode()) {
+        case KeyEvent.VK_SPACE -> listener.placeCueBall();
+        case KeyEvent.VK_LEFT -> listener.moveCueBallLeft();
+        case KeyEvent.VK_RIGHT -> listener.moveCueBallRight();
+        case KeyEvent.VK_UP -> listener.moveCueBallUp();
+        case KeyEvent.VK_DOWN -> listener.moveCueBallDown();
       }
     }
   };
@@ -136,6 +149,20 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
   @Override
   public void updateTime(ClockTime time) {
     clockView.setTime(time);
+  }
+
+  @Override
+  public void startPlacingCueBall() {
+    this.removeKeyListener(onKeyDown);
+    this.addKeyListener(cueBallPlacer);
+    setCueAvailable(false);
+  }
+
+  @Override
+  public void stopPlacingCueBall() {
+    this.removeKeyListener(cueBallPlacer);
+    this.addKeyListener(onKeyDown);
+    setCueAvailable(true);
   }
 
   @Override

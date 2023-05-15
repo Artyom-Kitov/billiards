@@ -94,6 +94,31 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
   }
 
   @Override
+  public void placeCueBall() {
+    field.placeCueBall();
+  }
+
+  @Override
+  public void moveCueBallLeft() {
+    field.moveCueBallLeft();
+  }
+
+  @Override
+  public void moveCueBallRight() {
+    field.moveCueBallRight();
+  }
+
+  @Override
+  public void moveCueBallUp() {
+    field.moveCueBallUp();
+  }
+
+  @Override
+  public void moveCueBallDown() {
+    field.moveCueBallDown();
+  }
+
+  @Override
   public void fieldChanged() {
     view.updateBalls(field.getBalls());
   }
@@ -114,5 +139,11 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
   @Override
   public void askForCueBall() {
     gameRunner.stop();
+    view.startPlacingCueBall();
+  }
+
+  @Override
+  public void cueBallPlaceSuccessful() {
+    view.stopPlacingCueBall();
   }
 }

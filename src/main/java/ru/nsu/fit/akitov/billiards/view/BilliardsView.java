@@ -14,4 +14,6 @@ public interface BilliardsView {
   void resetBalls(List<BallModel> balls);
   void updateCue(CueModel cue);
   void updateTime(ClockTime time);
+  void startPlacingCueBall();
+  void stopPlacingCueBall();
 }

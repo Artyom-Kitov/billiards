@@ -42,6 +42,7 @@ public class FieldView extends JPanel {
 
   public void setCueVisible(boolean b) {
     cueView.setVisible(b);
+    moveCue();
   }
 
   public void addPocket(PocketView pocket) {

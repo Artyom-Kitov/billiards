@@ -20,6 +20,7 @@ public class Field {
 
   private final float ballRadius;
   private final Ball cueBall;
+  private final float cueBallDelta = 1;
   private final List<Ball> balls;
 
   private final float pocketRadius;
@@ -126,10 +127,13 @@ public class Field {
 
   public void update(float milliseconds) {
     if (isMotionless()) {
+      listener.isMotionless();
       if (!cueBall.isAvailable()) {
+        cueBall.setAvailable(true);
+        cueBall.setPosition(sizeX / 4, sizeY / 2);
+        listener.fieldChanged();
         listener.askForCueBall();
       }
-      listener.isMotionless();
       return;
     }
     move(milliseconds * 0.001f);
@@ -169,5 +173,45 @@ public class Field {
 
   public ClockTime getElapsedTime() {
     return clock.getTime();
+  }
+
+  public void placeCueBall() {
+    if (cueBall.getX() - ballRadius < 0 || cueBall.getX() > sizeX / 4) {
+      return;
+    }
+    if (cueBall.getY() - ballRadius < 0 || cueBall.getY() + ballRadius > sizeY) {
+      return;
+    }
+    for (Pocket pocket : pockets) {
+      if (cueBall.isInPocket(pocket)) {
+        return;
+      }
+    }
+    for (int i = 1; i < balls.size(); i++) {
+      if (cueBall.collides(balls.get(i))) {
+        return;
+      }
+    }
+    listener.cueBallPlaceSuccessful();
+  }
+
+  public void moveCueBallLeft() {
+    cueBall.setPosition(cueBall.getX() - cueBallDelta, cueBall.getY());
+    listener.fieldChanged();
+  }
+
+  public void moveCueBallRight() {
+    cueBall.setPosition(cueBall.getX() + cueBallDelta, cueBall.getY());
+    listener.fieldChanged();
+  }
+
+  public void moveCueBallUp() {
+    cueBall.setPosition(cueBall.getX(), cueBall.getY() - 1);
+    listener.fieldChanged();
+  }
+
+  public void moveCueBallDown() {
+    cueBall.setPosition(cueBall.getX(), cueBall.getY() + 1);
+    listener.fieldChanged();
   }
 }
