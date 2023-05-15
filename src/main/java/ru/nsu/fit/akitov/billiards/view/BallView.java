@@ -8,16 +8,22 @@ public class BallView extends JComponent {
   private final int radius;
   private final Color color;
 
-  public BallView(int radius, int x, int y, Color color) {
+  public BallView(int radius, Color color) {
     this.radius = radius;
-    this.setLocation(x, y);
     this.color = color;
+  }
+
+  public void update(int x, int y, boolean visible) {
+    this.setLocation(x, y);
+    this.setVisible(visible);
   }
 
   @Override
   public void paintComponent(Graphics g) {
+    if (!isVisible()) {
+      return;
+    }
     g.setColor(color);
-    g.drawOval(getX() - radius, getY() - radius, 2 * radius, 2 * radius);
     g.fillOval(getX() - radius, getY() - radius, 2 * radius, 2 * radius);
   }
 }

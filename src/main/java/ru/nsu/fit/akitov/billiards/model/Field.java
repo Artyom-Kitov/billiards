@@ -19,13 +19,13 @@ public class Field {
   private final List<Point2D> startCoordinates;
 
   private final float ballRadius;
+  private final Ball cueBall;
   private final List<Ball> balls;
 
   private final float pocketRadius;
   private final List<Pocket> pockets;
 
   private final Cue cue;
-  private Ball cueBall;
 
   private final Clock clock;
 
@@ -45,12 +45,14 @@ public class Field {
       pockets.add(new Pocket(i * sizeX / 2.0f, sizeY, pocketRadius));
     }
 
+    cueBall = new Ball(0, 0, ballRadius);
+    balls.add(cueBall);
+    for (int i = 1; i < startCoordinates.size(); i++) {
+      balls.add(new Ball(0, 0, ballRadius));
+    }
     cue = new Cue(properties.fieldSize() * properties.relativeCueStrength());
     clock = new Clock();
     reset();
-  }
-  public BallModel getCueBall() {
-    return new BallModel(cueBall.getPosition(), (int) ballRadius);
   }
 
   public void setListener(FieldListener listener) {
@@ -58,26 +60,15 @@ public class Field {
   }
 
   public void reset() {
-    balls.clear();
     clock.reset();
-
-    Point2D startCueBall = startCoordinates.get(0);
-    cueBall = new Ball(startCueBall.x() * ballRadius, startCueBall.y() * ballRadius, ballRadius);
-
-    for (int i = 1; i < startCoordinates.size(); i++) {
+    for (int i = 0; i < startCoordinates.size(); i++) {
       Point2D position = startCoordinates.get(i);
-      balls.add(new Ball(position.x() * ballRadius, position.y() * ballRadius, ballRadius));
+      balls.get(i).setPosition(position.x() * ballRadius, position.y() * ballRadius);
+      balls.get(i).setAvailable(true);
     }
-  }
-
-  public void removeBall(int index) {
-    balls.remove(index);
   }
 
   public boolean isMotionless() {
-    if (!cueBall.isMotionless()) {
-      return false;
-    }
     for (Ball ball : balls) {
       if (!ball.isMotionless()) {
         return false;
@@ -88,7 +79,7 @@ public class Field {
 
   public List<BallModel> getBalls() {
     return balls.stream()
-            .map(ball -> new BallModel(ball.getPosition(), (int) ballRadius))
+            .map(ball -> new BallModel(ball.getPosition(), (int) ballRadius, ball.isAvailable()))
             .toList();
   }
 
@@ -99,33 +90,19 @@ public class Field {
   }
 
   private void move(float dt) {
-    cueBall.move(dt, SURFACE_FRICTION, GRAVITY);
-    if (cueBall.getX() - ballRadius < 0 || cueBall.getX() + ballRadius > sizeX) {
-      cueBall.setVelocity(-cueBall.getVelocityX(), cueBall.getVelocityY());
-    }
-    if (cueBall.getY() - ballRadius < 0 || cueBall.getY() + ballRadius > sizeY) {
-      cueBall.setVelocity(cueBall.getVelocityX(), -cueBall.getVelocityY());
-    }
     for (Ball ball : balls) {
       ball.move(dt, SURFACE_FRICTION, GRAVITY);
       if (ball.getX() - ballRadius < 0 || ball.getX() + ballRadius > sizeX) {
         ball.setVelocity(-ball.getVelocityX(), ball.getVelocityY());
-        ball.move(dt, SURFACE_FRICTION, GRAVITY);
       }
       if (ball.getY() - ballRadius < 0 || ball.getY() + ballRadius > sizeY) {
         ball.setVelocity(ball.getVelocityX(), -ball.getVelocityY());
       }
+      ball.unhookFromWalls(0, sizeX, 0, sizeY);
     }
   }
 
   private void updateVelocities() {
-    for (Ball ball : balls) {
-      if (cueBall.collides(ball)) {
-        cueBall.hit(ball);
-        cueBall.unhookFrom(ball);
-        cueBall.unhookFromWalls(0, sizeX, 0, sizeY);
-      }
-    }
     for (int i = 0; i < balls.size(); i++) {
       for (int j = i + 1; j < balls.size(); j++) {
         if (!balls.get(i).collides(balls.get(j))) {
@@ -133,39 +110,32 @@ public class Field {
         }
         balls.get(i).hit(balls.get(j));
         balls.get(i).unhookFrom(balls.get(j));
-        balls.get(i).unhookFromWalls(0, sizeX, 0, sizeY);
       }
     }
   }
 
   private void checkPockets() {
-    for (Pocket pocket : pockets) {
-      if (cueBall.isInPocket(pocket)) {
-         listener.cueBallInPocket();
-      }
-    }
-    List<Integer> ballsInPockets = new ArrayList<>();
-    for (int i = 0; i < balls.size(); i++) {
+    for (Ball ball : balls) {
       for (Pocket pocket : pockets) {
-        if (balls.get(i).isInPocket(pocket)) {
-          ballsInPockets.add(i);
+        if (ball.isInPocket(pocket)) {
+          ball.setAvailable(false);
         }
       }
-    }
-    for (int i : ballsInPockets) {
-      listener.ballInPocket(i);
     }
   }
 
   public void update(float milliseconds) {
     if (isMotionless()) {
+      if (!cueBall.isAvailable()) {
+        listener.askForCueBall();
+      }
       listener.isMotionless();
       return;
     }
     move(milliseconds * 0.001f);
     updateVelocities();
     checkPockets();
-    listener.ballsMoved();
+    listener.fieldChanged();
   }
 
   public void increaseCueVelocity() {

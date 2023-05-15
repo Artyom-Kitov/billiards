@@ -13,12 +13,15 @@ public class Ball {
   private float vx;
   private float vy;
 
+  private boolean available;
+
   public Ball(float x, float y, float radius) {
     this.x = x;
     this.y = y;
     this.radius = radius;
     this.vx = 0.0f;
     this.vy = 0.0f;
+    this.available = true;
   }
 
   public void move(float dt, float friction, float g) {
@@ -33,7 +36,7 @@ public class Ball {
   }
 
   public boolean isMotionless() {
-    return Math.abs(vx) < COMPARE_PRECISION && Math.abs(vy) < COMPARE_PRECISION;
+    return !isAvailable() || Math.abs(vx) < COMPARE_PRECISION && Math.abs(vy) < COMPARE_PRECISION;
   }
 
   public float getX() {
@@ -46,6 +49,11 @@ public class Ball {
 
   public Point2D getPosition() {
     return new Point2D(x, y);
+  }
+
+  public void setPosition(float x, float y) {
+    this.x = x;
+    this.y = y;
   }
 
   public float getVelocityX() {
@@ -61,11 +69,26 @@ public class Ball {
     this.vy = vy;
   }
 
+  public void setAvailable(boolean b) {
+    this.available = b;
+  }
+
+  public boolean isAvailable() {
+    return available;
+  }
+
   public boolean collides(Ball other) {
+    if (!isAvailable() || !other.isAvailable()) {
+      return false;
+    }
     return (x - other.x) * (x - other.x) + (y - other.y) * (y - other.y) <= 4 * radius * radius;
   }
 
   public void hit(Ball other) {
+    if (!isAvailable()) {
+      return;
+    }
+
     float centralX = other.x - x;
     float centralY = other.y - y;
 
@@ -89,6 +112,10 @@ public class Ball {
   }
 
   public void unhookFrom(Ball other) {
+    if (!isAvailable()) {
+      return;
+    }
+
     float dx = other.x - x;
     float dy = other.y - y;
 
@@ -101,21 +128,28 @@ public class Ball {
   }
 
   public void unhookFromWalls(float left, float right, float lower, float upper) {
+    if (!isAvailable()) {
+      return;
+    }
+
     if (x - radius < left) {
-      x = left;
+      x = left + radius;
     }
     if (x + radius > right) {
-      x = right;
+      x = right - radius;
     }
     if (y - radius < lower) {
-      y = lower;
+      y = lower + radius;
     }
     if (y + radius > upper) {
-      y = upper;
+      y = upper - radius;
     }
   }
 
   public boolean isInPocket(Pocket pocket) {
+    if (!isAvailable()) {
+      return false;
+    }
     return (x - pocket.x()) * (x - pocket.x()) + (y - pocket.y()) * (y - pocket.y()) <= pocket.radius() * pocket.radius();
   }
 }

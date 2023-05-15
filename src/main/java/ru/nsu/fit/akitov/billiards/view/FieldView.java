@@ -12,7 +12,6 @@ public class FieldView extends JPanel {
   private final Image background;
   private final List<BallView> balls;
   private int borderSize;
-  private BallView cueBall;
   private final List<PocketView> pockets;
   private final CueView cueView;
 
@@ -24,27 +23,13 @@ public class FieldView extends JPanel {
             .getScaledInstance(width, height, Image.SCALE_DEFAULT);
     balls = new ArrayList<>();
     pockets = new ArrayList<>();
-    cueBall = new BallView(0, 0, 0, Color.black);
+
     cueView = new CueView(width / 2, height / 16, cueBallRadius);
     this.setVisible(true);
   }
 
   public void setBorderSize(int borderSize) {
     this.borderSize = borderSize;
-  }
-
-  public void addCueBall(BallModel cueBall) {
-    this.cueBall = new BallView(cueBall.radius(), (int) cueBall.position().x(), (int) cueBall.position().y(), Color.darkGray);
-  }
-
-  public void addBall(BallView ball) {
-    ball.setLocation(ball.getX() + borderSize, ball.getY() + borderSize);
-    balls.add(ball);
-  }
-
-  public void setCueBallPosition(int x, int y) {
-    cueBall.setLocation(x + borderSize, y + borderSize);
-    cueView.setPosition(x + borderSize, y + borderSize);
   }
 
   public void setCueVelocity(float velocity) {
@@ -66,9 +51,9 @@ public class FieldView extends JPanel {
 
   public void updateBalls(List<BallModel> balls) {
     for (int i = 0; i < balls.size(); i++) {
-      int x = (int) balls.get(i).position().x();
-      int y = (int) balls.get(i).position().y();
-      this.balls.get(i).setLocation(x + borderSize, y + borderSize);
+      int x = (int) (balls.get(i).position().x() + borderSize);
+      int y = (int) (balls.get(i).position().y() + borderSize);
+      this.balls.get(i).update(x, y, balls.get(i).isAvailable());
     }
   }
 
@@ -76,13 +61,21 @@ public class FieldView extends JPanel {
     balls.clear();
   }
 
-  public void removeBall(int index) {
-    this.remove(balls.get(index));
-    balls.remove(index);
+  public void moveCue() {
+    if (balls.size() < 1) {
+      return;
+    }
+    cueView.setPosition(balls.get(0).getX(), balls.get(0).getY());
   }
 
-  public void moveCue() {
-    cueView.setPosition(cueBall.getX(), cueBall.getY());
+  public void resetBalls(List<BallModel> balls) {
+    this.balls.clear();
+    for (int i = 0; i < balls.size(); i++) {
+      Color color = (i == 0) ? Color.darkGray : Color.white;
+      this.balls.add(new BallView(balls.get(i).radius(), color));
+    }
+    updateBalls(balls);
+    moveCue();
   }
 
   @Override
@@ -95,7 +88,6 @@ public class FieldView extends JPanel {
     for (BallView ball : balls) {
       ball.paintComponent(g);
     }
-    cueBall.paintComponent(g);
     cueView.paintComponent(g);
   }
 }

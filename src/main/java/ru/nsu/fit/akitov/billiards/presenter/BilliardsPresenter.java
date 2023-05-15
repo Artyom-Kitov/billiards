@@ -2,7 +2,6 @@ package ru.nsu.fit.akitov.billiards.presenter;
 
 import ru.nsu.fit.akitov.billiards.model.Field;
 import ru.nsu.fit.akitov.billiards.model.FieldListener;
-import ru.nsu.fit.akitov.billiards.utils.BallModel;
 import ru.nsu.fit.akitov.billiards.utils.PocketModel;
 import ru.nsu.fit.akitov.billiards.view.BilliardsView;
 import ru.nsu.fit.akitov.billiards.view.ViewListener;
@@ -10,7 +9,6 @@ import ru.nsu.fit.akitov.billiards.view.ViewListener;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 
 // CR: add game end
 // CR: add records
@@ -47,12 +45,7 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
     view.clear();
     gameClock.restart();
 
-    view.addCueBall(field.getCueBall());
-    List<BallModel> balls = field.getBalls();
-    for (BallModel ball : balls) {
-      view.addBall(ball);
-    }
-//    view.setCue();
+    view.resetBalls(field.getBalls());
     view.setCueAvailable(true);
   }
 
@@ -68,7 +61,7 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
   }
 
   @Override
-  public void onSpacePressed() {
+  public void cueStrike() {
     if (field.getCue().velocity() == 0) {
       return;
     }
@@ -77,44 +70,32 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
   }
 
   @Override
-  public void onLeftPressed() {
+  public void rotateCueLeft() {
     field.rotateCueLeft();
     view.updateCue(field.getCue());
   }
 
   @Override
-  public void onRightPressed() {
+  public void rotateCueRight() {
     field.rotateCueRight();
     view.updateCue(field.getCue());
   }
 
   @Override
-  public void onUpPressed() {
+  public void reduceCueVelocity() {
     field.reduceCueVelocity();
     view.updateCue(field.getCue());
   }
 
   @Override
-  public void onDownPressed() {
+  public void increaseCueVelocity() {
     field.increaseCueVelocity();
     view.updateCue(field.getCue());
   }
 
   @Override
-  public void ballsMoved() {
-    view.updateCueBall(field.getCueBall());
+  public void fieldChanged() {
     view.updateBalls(field.getBalls());
-  }
-
-  @Override
-  public void ballInPocket(int ballIndex) {
-    field.removeBall(ballIndex);
-    view.removeBall(ballIndex);
-  }
-
-  @Override
-  public void cueBallInPocket() {
-    // CR: do we need this?
   }
 
   @Override
@@ -128,5 +109,10 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
   public void strikePerformed() {
     view.setCueAvailable(false);
     gameRunner.restart();
+  }
+
+  @Override
+  public void askForCueBall() {
+    gameRunner.stop();
   }
 }

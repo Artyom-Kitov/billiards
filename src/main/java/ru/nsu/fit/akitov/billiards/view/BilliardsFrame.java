@@ -25,11 +25,11 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
     @Override
     public void keyPressed(KeyEvent e) {
       switch (e.getKeyCode()) {
-        case KeyEvent.VK_SPACE -> listener.onSpacePressed();
-        case KeyEvent.VK_LEFT -> listener.onLeftPressed();
-        case KeyEvent.VK_RIGHT -> listener.onRightPressed();
-        case KeyEvent.VK_UP -> listener.onUpPressed();
-        case KeyEvent.VK_DOWN -> listener.onDownPressed();
+        case KeyEvent.VK_SPACE -> listener.cueStrike();
+        case KeyEvent.VK_LEFT -> listener.rotateCueLeft();
+        case KeyEvent.VK_RIGHT -> listener.rotateCueRight();
+        case KeyEvent.VK_UP -> listener.reduceCueVelocity();
+        case KeyEvent.VK_DOWN -> listener.increaseCueVelocity();
       }
     }
   };
@@ -110,30 +110,19 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
   }
 
   @Override
-  public void addBall(BallModel ball) {
-    fieldView.addBall(new BallView(ball.radius(), (int) ball.position().x(), (int) ball.position().y(), Color.white));
-  }
-
-  @Override
-  public void addCueBall(BallModel cueBall) {
-    fieldView.addCueBall(cueBall);
-    updateCueBall(cueBall);
-  }
-
-  @Override
   public void addPocket(PocketModel pocket) {
     fieldView.addPocket(new PocketView(pocket.radius(), (int) pocket.position().x(), (int) pocket.position().y()));
-  }
-
-  @Override
-  public void updateCueBall(BallModel cueBall) {
-    fieldView.setCueBallPosition((int) cueBall.position().x(), (int) cueBall.position().y());
   }
 
   @Override
   public void updateBalls(List<BallModel> balls) {
     fieldView.updateBalls(balls);
     repaint();
+  }
+
+  @Override
+  public void resetBalls(List<BallModel> balls) {
+    fieldView.resetBalls(balls);
   }
 
   @Override
@@ -147,11 +136,6 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
   @Override
   public void updateTime(ClockTime time) {
     clockView.setTime(time);
-  }
-
-  @Override
-  public void removeBall(int index) {
-    fieldView.removeBall(index);
   }
 
   @Override
