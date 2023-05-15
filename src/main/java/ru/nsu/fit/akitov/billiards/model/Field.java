@@ -20,7 +20,7 @@ public class Field {
 
   private final float ballRadius;
   private final Ball cueBall;
-  private final float cueBallDelta = 1;
+  private final float cueBallDelta = 4;
   private final List<Ball> balls;
 
   private final float pocketRadius;
@@ -175,43 +175,60 @@ public class Field {
     return clock.getTime();
   }
 
-  public void placeCueBall() {
-    if (cueBall.getX() - ballRadius < 0 || cueBall.getX() > sizeX / 4) {
-      return;
+  private boolean isSuitable(float x, float y) {
+    if (x - ballRadius < 0 || x + ballRadius > sizeX / 4) {
+      return false;
     }
-    if (cueBall.getY() - ballRadius < 0 || cueBall.getY() + ballRadius > sizeY) {
-      return;
+    if (y - ballRadius < 0 || y + ballRadius > sizeY) {
+      return false;
     }
     for (Pocket pocket : pockets) {
       if (cueBall.isInPocket(pocket)) {
-        return;
+        return false;
       }
     }
     for (int i = 1; i < balls.size(); i++) {
       if (cueBall.collides(balls.get(i))) {
-        return;
+        return false;
       }
     }
-    listener.cueBallPlaceSuccessful();
+    return true;
+  }
+  public void placeCueBall() {
+    if (isSuitable(cueBall.getX(), cueBall.getY())) {
+      listener.cueBallPlaceSuccessful();
+    }
   }
 
   public void moveCueBallLeft() {
+    if (cueBall.getX() - cueBallDelta - ballRadius < 0) {
+      return;
+    }
     cueBall.setPosition(cueBall.getX() - cueBallDelta, cueBall.getY());
     listener.fieldChanged();
   }
 
   public void moveCueBallRight() {
+    if (cueBall.getX() + cueBallDelta + ballRadius > sizeX / 4) {
+      return;
+    }
     cueBall.setPosition(cueBall.getX() + cueBallDelta, cueBall.getY());
     listener.fieldChanged();
   }
 
   public void moveCueBallUp() {
-    cueBall.setPosition(cueBall.getX(), cueBall.getY() - 1);
+    if (cueBall.getY() - cueBallDelta - ballRadius < 0) {
+      return;
+    }
+    cueBall.setPosition(cueBall.getX(), cueBall.getY() - cueBallDelta);
     listener.fieldChanged();
   }
 
   public void moveCueBallDown() {
-    cueBall.setPosition(cueBall.getX(), cueBall.getY() + 1);
+    if (cueBall.getY() + cueBallDelta + ballRadius > sizeY) {
+      return;
+    }
+    cueBall.setPosition(cueBall.getX(), cueBall.getY() + cueBallDelta);
     listener.fieldChanged();
   }
 }

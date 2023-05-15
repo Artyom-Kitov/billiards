@@ -21,7 +21,7 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
 
   private ViewListener listener;
 
-  private final KeyAdapter onKeyDown = new KeyAdapter() {
+  private final KeyAdapter cueController = new KeyAdapter() {
     @Override
     public void keyPressed(KeyEvent event) {
       switch (event.getKeyCode()) {
@@ -34,7 +34,7 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
     }
   };
 
-  private final KeyAdapter cueBallPlacer  = new KeyAdapter() {
+  private final KeyAdapter cueBallPlacer = new KeyAdapter() {
     @Override
     public void keyPressed(KeyEvent event) {
       switch (event.getKeyCode()) {
@@ -107,7 +107,7 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
 
   @Override
   public void start() {
-    addKeyListener(onKeyDown);
+    addKeyListener(cueController);
     repaint();
   }
 
@@ -153,7 +153,7 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
 
   @Override
   public void startPlacingCueBall() {
-    this.removeKeyListener(onKeyDown);
+    this.removeKeyListener(cueController);
     this.addKeyListener(cueBallPlacer);
     setCueAvailable(false);
   }
@@ -161,7 +161,7 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
   @Override
   public void stopPlacingCueBall() {
     this.removeKeyListener(cueBallPlacer);
-    this.addKeyListener(onKeyDown);
+    this.addKeyListener(cueController);
     setCueAvailable(true);
   }
 
@@ -169,9 +169,9 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
   public void setCueAvailable(boolean b) {
     fieldView.setCueVisible(b);
     if (b) {
-      this.addKeyListener(onKeyDown);
+      this.addKeyListener(cueController);
     } else {
-      this.removeKeyListener(onKeyDown);
+      this.removeKeyListener(cueController);
     }
     repaint();
   }
