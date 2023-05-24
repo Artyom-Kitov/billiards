@@ -6,4 +6,5 @@ public interface FieldListener {
   void strikePerformed();
   void askForCueBall();
   void cueBallPlaceSuccessful();
+  void gameOver();
 }

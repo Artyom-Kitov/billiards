@@ -146,4 +146,9 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
   public void cueBallPlaceSuccessful() {
     view.stopPlacingCueBall();
   }
+
+  @Override
+  public void gameOver() {
+    // TODO
+  }
 }

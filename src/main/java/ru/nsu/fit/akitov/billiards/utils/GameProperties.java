@@ -1,11 +1,12 @@
 package ru.nsu.fit.akitov.billiards.utils;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 
 import java.io.*;
 import java.util.*;
 
-@Builder(builderClassName = "PropertiesBuilder", setterPrefix = "set")
+@Builder(builderClassName = "PropertiesBuilder", setterPrefix = "set", access = AccessLevel.PUBLIC)
 public record GameProperties(int fieldSize, float relativeBallSize, int relativePocketSize, int relativeCueStrength,
                              List<Point2D> ballsCoordinates, int upperPanelSize, float relativeBorderSize,
                              String gameName, String menuOption, String newGameOption,

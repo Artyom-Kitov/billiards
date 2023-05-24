@@ -18,6 +18,9 @@ public class Ball {
   public Ball(float x, float y, float radius) {
     this.x = x;
     this.y = y;
+    if (radius <= 0) {
+      throw new IllegalArgumentException("radius cannot be less than or equal to zero");
+    }
     this.radius = radius;
     this.vx = 0.0f;
     this.vy = 0.0f;

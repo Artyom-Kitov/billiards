@@ -125,9 +125,21 @@ public class Field {
     }
   }
 
+  private boolean isEnd() {
+    for (int i = 1; i < balls.size(); i++) {
+      if (balls.get(i).isAvailable()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   public void update(float milliseconds) {
     if (isMotionless()) {
       listener.isMotionless();
+      if (isEnd()) {
+        listener.gameOver();
+      }
       if (!cueBall.isAvailable()) {
         cueBall.setAvailable(true);
         cueBall.setPosition(sizeX / 4, sizeY / 2);
@@ -175,7 +187,7 @@ public class Field {
     return clock.getTime();
   }
 
-  private boolean isSuitable(float x, float y) {
+  private boolean isFree(float x, float y) {
     if (x - ballRadius < 0 || x + ballRadius > sizeX / 4) {
       return false;
     }
@@ -195,7 +207,7 @@ public class Field {
     return true;
   }
   public void placeCueBall() {
-    if (isSuitable(cueBall.getX(), cueBall.getY())) {
+    if (isFree(cueBall.getX(), cueBall.getY())) {
       listener.cueBallPlaceSuccessful();
     }
   }
