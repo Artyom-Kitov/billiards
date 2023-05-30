@@ -6,8 +6,6 @@ import ru.nsu.fit.akitov.billiards.utils.GameProperties;
 import ru.nsu.fit.akitov.billiards.view.BilliardsFrame;
 import ru.nsu.fit.akitov.billiards.view.BilliardsView;
 
-// CR: add resize, cannot play :(
-// CR: also instructions would be nice...
 public class Main {
 
   public static void main(String[] args) {

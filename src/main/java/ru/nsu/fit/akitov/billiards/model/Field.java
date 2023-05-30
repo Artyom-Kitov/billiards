@@ -30,7 +30,7 @@ public class Field {
 
   private final Clock clock;
 
-  private FieldListener listener;
+  private final List<FieldListener> listeners;
 
   public Field(GameProperties properties) {
     this.sizeX = properties.fieldSize() * 2;
@@ -53,11 +53,12 @@ public class Field {
     }
     cue = new Cue(properties.fieldSize() * properties.relativeCueStrength());
     clock = new Clock();
+    listeners = new ArrayList<>();
     reset();
   }
 
-  public void setListener(FieldListener listener) {
-    this.listener = listener;
+  public void addListener(FieldListener listener) {
+    this.listeners.add(listener);
   }
 
   public void reset() {
@@ -136,22 +137,30 @@ public class Field {
 
   public void update(float milliseconds) {
     if (isMotionless()) {
-      listener.isMotionless();
+      for (FieldListener listener : listeners) {
+        listener.isMotionless();
+      }
       if (isEnd()) {
-        listener.gameOver();
+        for (FieldListener listener : listeners) {
+          listener.gameOver();
+        }
       }
       if (!cueBall.isAvailable()) {
         cueBall.setAvailable(true);
         cueBall.setPosition(sizeX / 4, sizeY / 2);
-        listener.fieldChanged();
-        listener.askForCueBall();
+        for (FieldListener listener : listeners) {
+          listener.fieldChanged();
+          listener.askForCueBall();
+        }
       }
       return;
     }
     move(milliseconds * 0.001f);
     updateVelocities();
     checkPockets();
-    listener.fieldChanged();
+    for (FieldListener listener : listeners) {
+      listener.fieldChanged();
+    }
   }
 
   public void increaseCueVelocity() {
@@ -176,7 +185,9 @@ public class Field {
 
   public void performCueStrike() {
     cue.strike(cueBall);
-    listener.strikePerformed();
+    for (FieldListener listener : listeners) {
+      listener.strikePerformed();
+    }
   }
 
   public void tickClock() {
@@ -208,7 +219,9 @@ public class Field {
   }
   public void placeCueBall() {
     if (isFree(cueBall.getX(), cueBall.getY())) {
-      listener.cueBallPlaceSuccessful();
+      for (FieldListener listener : listeners) {
+        listener.cueBallPlaceSuccessful();
+      }
     }
   }
 
@@ -217,7 +230,9 @@ public class Field {
       return;
     }
     cueBall.setPosition(cueBall.getX() - cueBallDelta, cueBall.getY());
-    listener.fieldChanged();
+    for (FieldListener listener : listeners) {
+      listener.fieldChanged();
+    }
   }
 
   public void moveCueBallRight() {
@@ -225,7 +240,9 @@ public class Field {
       return;
     }
     cueBall.setPosition(cueBall.getX() + cueBallDelta, cueBall.getY());
-    listener.fieldChanged();
+    for (FieldListener listener : listeners) {
+      listener.fieldChanged();
+    }
   }
 
   public void moveCueBallUp() {
@@ -233,7 +250,9 @@ public class Field {
       return;
     }
     cueBall.setPosition(cueBall.getX(), cueBall.getY() - cueBallDelta);
-    listener.fieldChanged();
+    for (FieldListener listener : listeners) {
+      listener.fieldChanged();
+    }
   }
 
   public void moveCueBallDown() {
@@ -241,6 +260,8 @@ public class Field {
       return;
     }
     cueBall.setPosition(cueBall.getX(), cueBall.getY() + cueBallDelta);
-    listener.fieldChanged();
+    for (FieldListener listener : listeners) {
+      listener.fieldChanged();
+    }
   }
 }

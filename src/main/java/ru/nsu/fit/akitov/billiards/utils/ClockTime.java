@@ -15,7 +15,9 @@ public record ClockTime(int minutes, int seconds) implements Comparable<ClockTim
 
   @Override
   public int compareTo(ClockTime o) {
-    return Comparator.comparingInt(ClockTime::minutes).thenComparingInt(ClockTime::seconds).compare(this, o);
+    return Comparator.comparingInt(ClockTime::minutes)
+            .thenComparingInt(ClockTime::seconds)
+            .compare(this, o);
   }
 
   @Override

@@ -52,7 +52,7 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
   @Override
   public void run() {
     view.attachListener(this);
-    field.setListener(this);
+    field.addListener(this);
     field.reset();
     for (PocketModel pocket : field.getPockets()) {
       view.addPocket(pocket);

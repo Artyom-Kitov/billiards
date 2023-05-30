@@ -10,12 +10,10 @@ import java.util.Objects;
 
 public class AboutFrame extends JFrame {
 
-  public static final AboutFrame INSTANCE = new AboutFrame();
-
   private final Image background;
   private final List<String> lines;
 
-  private AboutFrame() {
+  public AboutFrame() {
     background = Toolkit.getDefaultToolkit().getImage(AboutFrame.class.getResource("/about.png"));
     this.setIconImage(Toolkit.getDefaultToolkit().getImage(AboutFrame.class.getResource("/logo.png")));
 
@@ -33,7 +31,7 @@ public class AboutFrame extends JFrame {
     this.setLayout(null);
     this.setResizable(false);
     this.pack();
-    this.setVisible(true);
+    this.setVisible(false);
   }
 
   @Override

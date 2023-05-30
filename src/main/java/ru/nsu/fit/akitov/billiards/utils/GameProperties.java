@@ -9,7 +9,7 @@ import java.util.*;
 @Builder(builderClassName = "PropertiesBuilder", setterPrefix = "set", access = AccessLevel.PUBLIC)
 public record GameProperties(int fieldSize, float relativeBallSize, int relativePocketSize, int relativeCueStrength,
                              List<Point2D> ballsCoordinates, int upperPanelSize, float relativeBorderSize,
-                             String gameName, String menuOption, String newGameOption,
+                             String gameName, String menuOption, String newGameOption, String highscoresOption,
                              String aboutOption, String exitOption) implements ModelProperties, ViewProperties {
 
   public static class PropertiesBuilder {
@@ -23,12 +23,14 @@ public record GameProperties(int fieldSize, float relativeBallSize, int relative
     private String gameName = "Billiards";
     private String menuOption = "Menu";
     private String newGameOption = "New Game";
+    private String highscoresOption = "Highscores";
     private String aboutOption = "About";
     private String exitOption = "Exit";
   }
 
   public static List<Point2D> getBallsCoordinates() {
     try (InputStream stream = GameProperties.class.getResourceAsStream("/coordinates")) {
+
       Scanner scanner = new Scanner(Objects.requireNonNull(stream));
       List<Point2D> result = new ArrayList<>();
       result.add(new Point2D(scanner.nextFloat(), scanner.nextFloat()));
@@ -60,6 +62,7 @@ public record GameProperties(int fieldSize, float relativeBallSize, int relative
               .setGameName(properties.getProperty("GameName"))
               .setMenuOption(properties.getProperty("MenuOption"))
               .setNewGameOption(properties.getProperty("NewGameOption"))
+              .setHighscoresOption(properties.getProperty("HighscoresOption"))
               .setAboutOption(properties.getProperty("AboutOption"))
               .setExitOption(properties.getProperty("ExitOption"));
       return builder.build();

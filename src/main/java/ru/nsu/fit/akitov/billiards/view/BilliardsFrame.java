@@ -12,12 +12,15 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
 
   private final String menuOption;
   private final String newGameOption;
+  private final String highscoresOption;
   private final String aboutGameOption;
   private final String exitOption;
 
   private final FieldView fieldView;
   private final ClockView clockView;
   private final int menuBarSize = 25;
+
+  private final AboutFrame aboutFrame;
 
   private ViewListener listener;
 
@@ -69,8 +72,11 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
 
     menuOption = properties.menuOption();
     newGameOption = properties.newGameOption();
+    highscoresOption = properties.highscoresOption();
     aboutGameOption = properties.aboutOption();
     exitOption = properties.exitOption();
+
+    aboutFrame = new AboutFrame();
 
     SpringLayout layout = new SpringLayout();
     layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, clockView, 0, SpringLayout.HORIZONTAL_CENTER, getContentPane());
@@ -89,14 +95,16 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
     JMenu menu = new JMenu(menuOption);
 
     JMenuItem newGameItem = new JMenuItem(newGameOption);
+    JMenuItem highscoresItem = new JMenuItem(highscoresOption);
     JMenuItem aboutItem = new JMenuItem(aboutGameOption);
     JMenuItem exitItem = new JMenuItem(exitOption);
 
     newGameItem.addActionListener(event -> listener.newGame());
-    aboutItem.addActionListener(event -> AboutFrame.INSTANCE.setVisible(true));
+    aboutItem.addActionListener(event -> aboutFrame.setVisible(true));
     exitItem.addActionListener(event -> System.exit(0));
 
     menu.add(newGameItem);
+    menu.add(highscoresItem);
     menu.add(aboutItem);
     menu.add(exitItem);
     menuBar.add(menu);

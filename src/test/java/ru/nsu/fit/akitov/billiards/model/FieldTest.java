@@ -1,10 +1,7 @@
 package ru.nsu.fit.akitov.billiards.model;
 
 import org.junit.jupiter.api.Test;
-import ru.nsu.fit.akitov.billiards.utils.BallModel;
-import ru.nsu.fit.akitov.billiards.utils.GameProperties;
-import ru.nsu.fit.akitov.billiards.utils.PocketModel;
-import ru.nsu.fit.akitov.billiards.utils.Point2D;
+import ru.nsu.fit.akitov.billiards.utils.*;
 
 import java.util.List;
 
@@ -38,5 +35,21 @@ class FieldTest {
       assertTrue(pockets.contains(p1));
       assertTrue(pockets.contains(p2));
     }
+  }
+
+  @Test
+  public void ballInPocket() {
+    List<Point2D> startPositions = List.of(new Point2D(2, 1));
+    GameProperties gameProperties = GameProperties.builder().setBallsCoordinates(startPositions).build();
+
+    Field field = new Field(gameProperties);
+    for (int i = 0; i < 100; i++) {
+      field.increaseCueVelocity();
+    }
+    field.performCueStrike();
+    while (!field.isMotionless()) {
+      field.update(5);
+    }
+    assertFalse(field.getBalls().get(0).isAvailable());
   }
 }

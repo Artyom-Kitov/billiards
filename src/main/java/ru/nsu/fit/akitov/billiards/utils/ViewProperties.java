@@ -6,6 +6,7 @@ public interface ViewProperties {
   String gameName();
   String menuOption();
   String newGameOption();
+  String highscoresOption();
   String aboutOption();
   String exitOption();
 }
