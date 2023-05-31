@@ -28,9 +28,8 @@ public record GameProperties(int fieldSize, float relativeBallSize, int relative
     private String exitOption = "Exit";
   }
 
-  public static List<Point2D> getBallsCoordinates() {
+  public static List<Point2D> readBallCoordinates() {
     try (InputStream stream = GameProperties.class.getResourceAsStream("/coordinates")) {
-
       Scanner scanner = new Scanner(Objects.requireNonNull(stream));
       List<Point2D> result = new ArrayList<>();
       result.add(new Point2D(scanner.nextFloat(), scanner.nextFloat()));
@@ -56,7 +55,7 @@ public record GameProperties(int fieldSize, float relativeBallSize, int relative
               .setRelativeBallSize(Float.parseFloat(properties.getProperty("RelativeBallSize")))
               .setRelativePocketSize(Integer.parseUnsignedInt(properties.getProperty("RelativePocketSize")))
               .setRelativeCueStrength(Integer.parseUnsignedInt(properties.getProperty("RelativeCueStrength")))
-              .setBallsCoordinates(getBallsCoordinates())
+              .setBallsCoordinates(readBallCoordinates())
               .setUpperPanelSize(Integer.parseUnsignedInt(properties.getProperty("UpperPanelSize")))
               .setRelativeBorderSize(Float.parseFloat(properties.getProperty("RelativeBorderSize")))
               .setGameName(properties.getProperty("GameName"))

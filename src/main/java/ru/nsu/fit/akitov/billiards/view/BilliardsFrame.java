@@ -20,6 +20,7 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
   private final ClockView clockView;
   private final int menuBarSize = 25;
 
+  private final HighscoresFrame highscoresFrame;
   private final AboutFrame aboutFrame;
 
   private ViewListener listener;
@@ -76,6 +77,7 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
     aboutGameOption = properties.aboutOption();
     exitOption = properties.exitOption();
 
+    highscoresFrame = new HighscoresFrame();
     aboutFrame = new AboutFrame();
 
     SpringLayout layout = new SpringLayout();
@@ -100,6 +102,7 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
     JMenuItem exitItem = new JMenuItem(exitOption);
 
     newGameItem.addActionListener(event -> listener.newGame());
+    highscoresItem.addActionListener(event -> highscoresFrame.setVisible(true));
     aboutItem.addActionListener(event -> aboutFrame.setVisible(true));
     exitItem.addActionListener(event -> System.exit(0));
 

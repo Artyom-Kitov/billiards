@@ -1,6 +1,6 @@
 package ru.nsu.fit.akitov.billiards.utils;
 
-import java.util.Comparator;
+import java.util.*;
 
 public record Highscore(String name, int ballsCount, int time) implements Comparable<Highscore> {
 
@@ -18,8 +18,10 @@ public record Highscore(String name, int ballsCount, int time) implements Compar
 
   @Override
   public int compareTo(Highscore o) {
-    return Comparator.comparingInt(Highscore::time)
-            .thenComparingInt(highscore -> -highscore.ballsCount())
+    return Comparator.comparingInt(Highscore::ballsCount)
+            .reversed()
+            .thenComparingInt(Highscore::time)
+            .thenComparing(Highscore::toString)
             .compare(this, o);
   }
 
