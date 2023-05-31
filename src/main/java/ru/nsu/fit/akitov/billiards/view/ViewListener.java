@@ -12,4 +12,5 @@ public interface ViewListener {
   void moveCueBallRight();
   void moveCueBallUp();
   void moveCueBallDown();
+  void playerNameEnter(String name);
 }

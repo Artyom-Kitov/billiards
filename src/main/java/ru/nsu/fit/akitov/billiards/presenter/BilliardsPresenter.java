@@ -2,6 +2,8 @@ package ru.nsu.fit.akitov.billiards.presenter;
 
 import ru.nsu.fit.akitov.billiards.model.Field;
 import ru.nsu.fit.akitov.billiards.model.FieldListener;
+import ru.nsu.fit.akitov.billiards.utils.Highscore;
+import ru.nsu.fit.akitov.billiards.utils.HighscoresTable;
 import ru.nsu.fit.akitov.billiards.utils.PocketModel;
 import ru.nsu.fit.akitov.billiards.view.BilliardsView;
 import ru.nsu.fit.akitov.billiards.view.ViewListener;
@@ -10,8 +12,6 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-// CR: add game end
-// CR: add records
 public class BilliardsPresenter implements Runnable, FieldListener, ViewListener {
 
   private final BilliardsView view;
@@ -119,6 +119,14 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
   }
 
   @Override
+  public void playerNameEnter(String name) {
+    int elapsed = field.getElapsedTime().minutes() * 60 + field.getElapsedTime().seconds();
+    Highscore highscore = new Highscore(name, field.getBalls().size(), elapsed);
+    HighscoresTable.addHighscore(highscore);
+    newGame();
+  }
+
+  @Override
   public void fieldChanged() {
     view.updateBalls(field.getBalls());
   }
@@ -149,6 +157,8 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
 
   @Override
   public void gameOver() {
-    // TODO
+    gameRunner.stop();
+    gameClock.stop();
+    view.startEnteringName();
   }
 }

@@ -16,4 +16,5 @@ public interface BilliardsView {
   void updateTime(ClockTime time);
   void startPlacingCueBall();
   void stopPlacingCueBall();
+  void startEnteringName();
 }

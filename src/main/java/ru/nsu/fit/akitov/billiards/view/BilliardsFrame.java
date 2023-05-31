@@ -8,7 +8,7 @@ import java.awt.event.*;
 
 import java.util.List;
 
-public class BilliardsFrame extends JFrame implements BilliardsView {
+public class BilliardsFrame extends JFrame implements BilliardsView, NameEnterObserver {
 
   private final String menuOption;
   private final String newGameOption;
@@ -22,6 +22,7 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
 
   private final HighscoresFrame highscoresFrame;
   private final AboutFrame aboutFrame;
+  private final NameEnteringFrame nameEnteringFrame;
 
   private ViewListener listener;
 
@@ -79,6 +80,8 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
 
     highscoresFrame = new HighscoresFrame();
     aboutFrame = new AboutFrame();
+    nameEnteringFrame = new NameEnteringFrame();
+    nameEnteringFrame.addObserver(this);
 
     SpringLayout layout = new SpringLayout();
     layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, clockView, 0, SpringLayout.HORIZONTAL_CENTER, getContentPane());
@@ -177,6 +180,12 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
   }
 
   @Override
+  public void startEnteringName() {
+    nameEnteringFrame.setVisible(true);
+    this.removeKeyListener(cueController);
+  }
+
+  @Override
   public void setCueAvailable(boolean b) {
     fieldView.setCueVisible(b);
     if (b) {
@@ -185,5 +194,12 @@ public class BilliardsFrame extends JFrame implements BilliardsView {
       this.removeKeyListener(cueController);
     }
     repaint();
+  }
+
+  @Override
+  public void nameEntered(String name) {
+    this.addKeyListener(cueController);
+    nameEnteringFrame.setVisible(false);
+    listener.playerNameEnter(name);
   }
 }
