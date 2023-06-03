@@ -7,8 +7,12 @@ import java.io.*;
 import java.util.*;
 
 @Builder(builderClassName = "PropertiesBuilder", setterPrefix = "set", access = AccessLevel.PUBLIC)
-public record GameProperties(int fieldSize, float relativeBallSize, int relativePocketSize, int relativeCueStrength,
-                             List<Point2D> ballsCoordinates, int upperPanelSize, float relativeBorderSize,
+public record GameProperties(int fieldSize, float relativeBallSize,
+                             // CR: move to properties maybe?
+                             int relativePocketSize,
+                             int relativeCueStrength, List<Point2D> ballsCoordinates,
+
+                             int upperPanelSize, float relativeBorderSize,
                              String gameName, String menuOption, String newGameOption, String highscoresOption,
                              String aboutOption, String exitOption) implements ModelProperties, ViewProperties {
 
@@ -28,9 +32,12 @@ public record GameProperties(int fieldSize, float relativeBallSize, int relative
     private String exitOption = "Exit";
   }
 
-  public static List<Point2D> readBallCoordinates() {
+  private static List<Point2D> readBallCoordinates() {
     try (InputStream stream = GameProperties.class.getResourceAsStream("/coordinates")) {
-      Scanner scanner = new Scanner(Objects.requireNonNull(stream));
+      if (stream == null) {
+        return List.of(new Point2D(14, 14));
+      }
+      Scanner scanner = new Scanner(stream);
       List<Point2D> result = new ArrayList<>();
       result.add(new Point2D(scanner.nextFloat(), scanner.nextFloat()));
 
@@ -39,18 +46,22 @@ public record GameProperties(int fieldSize, float relativeBallSize, int relative
         result.add(new Point2D(scanner.nextFloat(), scanner.nextFloat()));
       }
       return result;
-    } catch (NoSuchElementException | NullPointerException | IOException e) {
+    } catch (NoSuchElementException | IOException e) {
+      // CR: log
       return List.of(new Point2D(14, 14));
     }
   }
 
   public static GameProperties readFromConfig() {
+    PropertiesBuilder builder = new PropertiesBuilder();
     try {
       InputStream stream = GameProperties.class.getResourceAsStream("/config.properties");
+      if (stream == null) {
+        return builder.build();
+      }
       Properties properties = new Properties();
       properties.load(stream);
 
-      PropertiesBuilder builder = new PropertiesBuilder();
       builder.setFieldSize(Integer.parseUnsignedInt(properties.getProperty("FieldSize")))
               .setRelativeBallSize(Float.parseFloat(properties.getProperty("RelativeBallSize")))
               .setRelativePocketSize(Integer.parseUnsignedInt(properties.getProperty("RelativePocketSize")))
@@ -65,8 +76,8 @@ public record GameProperties(int fieldSize, float relativeBallSize, int relative
               .setAboutOption(properties.getProperty("AboutOption"))
               .setExitOption(properties.getProperty("ExitOption"));
       return builder.build();
-    } catch (IOException | NumberFormatException | NullPointerException e) {
-      return new PropertiesBuilder().build();
+    } catch (IOException | NumberFormatException e) {
+      return builder.build();
     }
   }
 }

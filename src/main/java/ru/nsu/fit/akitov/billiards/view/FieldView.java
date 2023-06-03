@@ -50,6 +50,7 @@ public class FieldView extends JPanel {
     pockets.add(pocket);
   }
 
+  // CR: pass player ball separately
   public void updateBalls(List<BallModel> balls) {
     for (int i = 0; i < balls.size(); i++) {
       int x = (int) (balls.get(i).position().x() + borderSize);

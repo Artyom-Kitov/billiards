@@ -13,6 +13,7 @@ public class NameEnteringFrame extends JFrame {
 
   private final JTextField textField;
 
+  // CR: only one
   private final List<NameEnterObserver> observers;
 
   public NameEnteringFrame() {
@@ -29,11 +30,12 @@ public class NameEnteringFrame extends JFrame {
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        if (textField.getText().contains(" ")) {
+        String name = textField.getText();
+        if (name.isEmpty() || name.contains(" ")) {
           return;
         }
         for (NameEnterObserver observer : observers) {
-          observer.nameEntered(textField.getText());
+          observer.nameEntered(name);
         }
       }
     });

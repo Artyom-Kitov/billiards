@@ -16,6 +16,7 @@ public class HighscoresFrame extends JFrame {
   private final JPanel panel;
 
   public HighscoresFrame() {
+    // CR: return highscore
     String[][] data = HighscoresTable.getTable();
     JTable table = new JTable(data, COLUMNS);
     table.setBounds(0, 0, 512, 400);

@@ -26,6 +26,7 @@ public class BilliardsFrame extends JFrame implements BilliardsView, NameEnterOb
 
   private ViewListener listener;
 
+  // CR: check if adds only once
   private final KeyAdapter cueController = new KeyAdapter() {
     @Override
     public void keyPressed(KeyEvent event) {
@@ -198,8 +199,7 @@ public class BilliardsFrame extends JFrame implements BilliardsView, NameEnterOb
 
   @Override
   public void nameEntered(String name) {
-    this.addKeyListener(cueController);
-    nameEnteringFrame.setVisible(false);
     listener.playerNameEnter(name);
+    nameEnteringFrame.setVisible(false);
   }
 }

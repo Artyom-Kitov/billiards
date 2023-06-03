@@ -13,6 +13,8 @@ public class Field {
   private static final float DELTA_VELOCITY = 50f;
   private static final float DELTA_ANGLE = (float) Math.PI / 180f;
 
+  private static final float CUE_BALL_DELTA = 4;
+
   private final float sizeX;
   private final float sizeY;
 
@@ -20,7 +22,6 @@ public class Field {
 
   private final float ballRadius;
   private final Ball cueBall;
-  private final float cueBallDelta = 4;
   private final List<Ball> balls;
 
   private final float pocketRadius;
@@ -183,11 +184,15 @@ public class Field {
     return new CueModel(cue.getVelocity(), cue.getAngle());
   }
 
-  public void performCueStrike() {
+  public boolean performCueStrike() {
+    if (cue.getVelocity() == 0) {
+      return false;
+    }
     cue.strike(cueBall);
     for (FieldListener listener : listeners) {
       listener.strikePerformed();
     }
+    return true;
   }
 
   public void tickClock() {
@@ -226,40 +231,40 @@ public class Field {
   }
 
   public void moveCueBallLeft() {
-    if (cueBall.getX() - cueBallDelta - ballRadius < 0) {
+    if (cueBall.getX() - CUE_BALL_DELTA - ballRadius < 0) {
       return;
     }
-    cueBall.setPosition(cueBall.getX() - cueBallDelta, cueBall.getY());
+    cueBall.setPosition(cueBall.getX() - CUE_BALL_DELTA, cueBall.getY());
     for (FieldListener listener : listeners) {
       listener.fieldChanged();
     }
   }
 
   public void moveCueBallRight() {
-    if (cueBall.getX() + cueBallDelta + ballRadius > sizeX / 4) {
+    if (cueBall.getX() + CUE_BALL_DELTA + ballRadius > sizeX / 4) {
       return;
     }
-    cueBall.setPosition(cueBall.getX() + cueBallDelta, cueBall.getY());
+    cueBall.setPosition(cueBall.getX() + CUE_BALL_DELTA, cueBall.getY());
     for (FieldListener listener : listeners) {
       listener.fieldChanged();
     }
   }
 
   public void moveCueBallUp() {
-    if (cueBall.getY() - cueBallDelta - ballRadius < 0) {
+    if (cueBall.getY() - CUE_BALL_DELTA - ballRadius < 0) {
       return;
     }
-    cueBall.setPosition(cueBall.getX(), cueBall.getY() - cueBallDelta);
+    cueBall.setPosition(cueBall.getX(), cueBall.getY() - CUE_BALL_DELTA);
     for (FieldListener listener : listeners) {
       listener.fieldChanged();
     }
   }
 
   public void moveCueBallDown() {
-    if (cueBall.getY() + cueBallDelta + ballRadius > sizeY) {
+    if (cueBall.getY() + CUE_BALL_DELTA + ballRadius > sizeY) {
       return;
     }
-    cueBall.setPosition(cueBall.getX(), cueBall.getY() + cueBallDelta);
+    cueBall.setPosition(cueBall.getX(), cueBall.getY() + CUE_BALL_DELTA);
     for (FieldListener listener : listeners) {
       listener.fieldChanged();
     }

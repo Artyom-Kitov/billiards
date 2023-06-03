@@ -21,7 +21,7 @@ public record Highscore(String name, int ballsCount, int time) implements Compar
     return Comparator.comparingInt(Highscore::ballsCount)
             .reversed()
             .thenComparingInt(Highscore::time)
-            .thenComparing(Highscore::toString)
+            .thenComparing(Highscore::name)
             .compare(this, o);
   }
 

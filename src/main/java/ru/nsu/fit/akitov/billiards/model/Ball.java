@@ -114,6 +114,7 @@ public class Ball {
     other.vy = (other.vy - otherCentralProjectionY + thisCentralProjectionY);
   }
 
+  // CR(minor): maybe just put ball as close as possible and then calc collision
   public void unhookFrom(Ball other) {
     if (!isAvailable()) {
       return;

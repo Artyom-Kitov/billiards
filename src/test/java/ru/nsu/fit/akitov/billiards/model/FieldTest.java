@@ -42,6 +42,7 @@ class FieldTest {
     List<Point2D> startPositions = List.of(new Point2D(2, 1));
     GameProperties gameProperties = GameProperties.builder().setBallsCoordinates(startPositions).build();
 
+    // CR: set fake listener, remove list of listeners
     Field field = new Field(gameProperties);
     for (int i = 0; i < 100; i++) {
       field.increaseCueVelocity();

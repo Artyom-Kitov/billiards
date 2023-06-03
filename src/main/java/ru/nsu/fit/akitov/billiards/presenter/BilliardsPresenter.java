@@ -51,22 +51,22 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
 
   @Override
   public void run() {
+    // CR: additional listener
     view.attachListener(this);
     field.addListener(this);
     field.reset();
     for (PocketModel pocket : field.getPockets()) {
       view.addPocket(pocket);
     }
+    // CR: also add balls here
     view.start();
   }
 
   @Override
   public void cueStrike() {
-    if (field.getCue().velocity() == 0) {
-      return;
+    if (field.performCueStrike()) {
+      view.setCueAvailable(false);
     }
-    field.performCueStrike();
-    view.setCueAvailable(false);
   }
 
   @Override
