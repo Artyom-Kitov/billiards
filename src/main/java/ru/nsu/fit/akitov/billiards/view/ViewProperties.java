@@ -1,6 +1,5 @@
-package ru.nsu.fit.akitov.billiards.utils;
+package ru.nsu.fit.akitov.billiards.view;
 
-// CR: move to view
 public interface ViewProperties {
   int upperPanelSize();
   float relativeBorderSize();

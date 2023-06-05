@@ -1,6 +1,8 @@
 package ru.nsu.fit.akitov.billiards.model;
 
 import org.junit.jupiter.api.Test;
+import ru.nsu.fit.akitov.billiards.dto.BallModel;
+import ru.nsu.fit.akitov.billiards.dto.PocketModel;
 import ru.nsu.fit.akitov.billiards.utils.*;
 
 import java.util.List;

@@ -1,25 +1,22 @@
 package ru.nsu.fit.akitov.billiards.utils;
 
 import java.io.*;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.spi.FileSystemProvider;
 import java.util.*;
-import java.util.stream.Stream;
 
 public class HighscoresTable {
 
-  private static final Set<Highscore> HIGHSCORES = new TreeSet<>();
+  private final Set<Highscore> HIGHSCORES = new TreeSet<>();
+  public static final HighscoresTable INSTANCE = new HighscoresTable();
 
-  private HighscoresTable() {}
+  private HighscoresTable() {
+    readFromConfig();
+  }
 
-  private static void readFromConfig() {
-    // CR: write to local var
-    HIGHSCORES.clear();
+  private void readFromConfig() {
+    Set<Highscore> highscores = new TreeSet<>();
     try (InputStream stream = HighscoresTable.class.getResourceAsStream("/highscores")) {
       List<String> lines = new BufferedReader(new InputStreamReader(Objects.requireNonNull(stream)))
               .lines()
@@ -27,14 +24,16 @@ public class HighscoresTable {
       for (String line : lines) {
         String[] args = line.split(" ");
         Highscore highscore = new Highscore(args[0], Integer.parseUnsignedInt(args[1]), Integer.parseUnsignedInt(args[2]));
-        HIGHSCORES.add(highscore);
+        highscores.add(highscore);
       }
-    } catch (IndexOutOfBoundsException | IOException | NumberFormatException e) {
       HIGHSCORES.clear();
+      HIGHSCORES.addAll(highscores);
+    } catch (IndexOutOfBoundsException | IOException | NumberFormatException e) {
+      // CR: log
     }
   }
 
-  public static void writeToConfig() {
+  public void writeToConfig() {
     try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(HighscoresTable.class.getResource("/highscores").toURI()))) {
       for (Highscore highscore : HIGHSCORES) {
         writer.write(highscore.toString() + "\n");
@@ -44,15 +43,11 @@ public class HighscoresTable {
     }
   }
 
-  public static String[][] getTable() {
-    // CR: do not read each time
-    readFromConfig();
-    return HIGHSCORES.stream()
-            .map(hs -> new String[] {hs.name(), String.valueOf(hs.ballsCount()), String.valueOf(hs.time())})
-            .toArray(String[][]::new);
+  public List<Highscore> getHighscores() {
+    return HIGHSCORES.stream().toList();
   }
 
-  public static void addHighscore(Highscore highscore) {
+  public void addHighscore(Highscore highscore) {
     HIGHSCORES.add(highscore);
     writeToConfig();
   }

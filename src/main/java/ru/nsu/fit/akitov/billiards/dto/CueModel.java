@@ -1,4 +1,4 @@
-package ru.nsu.fit.akitov.billiards.utils;
+package ru.nsu.fit.akitov.billiards.dto;
 
 public record CueModel(float velocity, float angle) {
 }

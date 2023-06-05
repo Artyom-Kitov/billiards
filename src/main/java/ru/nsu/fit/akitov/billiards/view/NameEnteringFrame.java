@@ -2,10 +2,6 @@ package ru.nsu.fit.akitov.billiards.view;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
 
 public class NameEnteringFrame extends JFrame {
   private static final int WIDTH = 512;
@@ -13,8 +9,7 @@ public class NameEnteringFrame extends JFrame {
 
   private final JTextField textField;
 
-  // CR: only one
-  private final List<NameEnterObserver> observers;
+  private NameEnterObserver observer;
 
   public NameEnteringFrame() {
     JLabel label = new JLabel("The game is over! Enter your name:");
@@ -27,23 +22,16 @@ public class NameEnteringFrame extends JFrame {
     JButton button = new JButton("Confirm");
     button.setPreferredSize(new Dimension(100, 40));
     button.setBackground(Color.LIGHT_GRAY);
-    button.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        String name = textField.getText();
-        if (name.isEmpty() || name.contains(" ")) {
-          return;
-        }
-        for (NameEnterObserver observer : observers) {
-          observer.nameEntered(name);
-        }
+    button.addActionListener(e -> {
+      String name = textField.getText();
+      if (name.isEmpty() || name.contains(" ")) {
+        return;
       }
+      observer.nameEntered(name);
     });
     this.add(button);
 
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-
-    observers = new ArrayList<>();
 
     SpringLayout layout = new SpringLayout();
     layout.putConstraint(SpringLayout.WEST, label, 0, SpringLayout.WEST, getContentPane());
@@ -59,7 +47,7 @@ public class NameEnteringFrame extends JFrame {
     this.setVisible(false);
   }
 
-  public void addObserver(NameEnterObserver observer) {
-    observers.add(observer);
+  public void setObserver(NameEnterObserver observer) {
+    this.observer = observer;
   }
 }

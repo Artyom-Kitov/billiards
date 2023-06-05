@@ -1,5 +1,8 @@
 package ru.nsu.fit.akitov.billiards.model;
 
+import ru.nsu.fit.akitov.billiards.dto.BallModel;
+import ru.nsu.fit.akitov.billiards.dto.CueModel;
+import ru.nsu.fit.akitov.billiards.dto.PocketModel;
 import ru.nsu.fit.akitov.billiards.utils.*;
 
 import java.util.ArrayList;
@@ -13,7 +16,7 @@ public class Field {
   private static final float DELTA_VELOCITY = 50f;
   private static final float DELTA_ANGLE = (float) Math.PI / 180f;
 
-  private static final float CUE_BALL_DELTA = 4;
+  private static final float CUE_BALL_PLACE_DELTA = 4;
 
   private final float sizeX;
   private final float sizeY;
@@ -31,7 +34,7 @@ public class Field {
 
   private final Clock clock;
 
-  private final List<FieldListener> listeners;
+  private FieldListener listener;
 
   public Field(GameProperties properties) {
     this.sizeX = properties.fieldSize() * 2;
@@ -54,12 +57,11 @@ public class Field {
     }
     cue = new Cue(properties.fieldSize() * properties.relativeCueStrength());
     clock = new Clock();
-    listeners = new ArrayList<>();
     reset();
   }
 
-  public void addListener(FieldListener listener) {
-    this.listeners.add(listener);
+  public void setListener(FieldListener listener) {
+    this.listener = listener;
   }
 
   public void reset() {
@@ -67,6 +69,7 @@ public class Field {
     for (int i = 0; i < startCoordinates.size(); i++) {
       Point2D position = startCoordinates.get(i);
       balls.get(i).setPosition(position.x() * ballRadius, position.y() * ballRadius);
+      balls.get(i).setVelocity(0, 0);
       balls.get(i).setAvailable(true);
     }
   }
@@ -80,8 +83,13 @@ public class Field {
     return true;
   }
 
+  public BallModel getCueBall() {
+    return new BallModel(cueBall.getPosition(), (int) ballRadius, cueBall.isAvailable());
+  }
+
   public List<BallModel> getBalls() {
     return balls.stream()
+            .skip(1)
             .map(ball -> new BallModel(ball.getPosition(), (int) ballRadius, ball.isAvailable()))
             .toList();
   }
@@ -138,30 +146,22 @@ public class Field {
 
   public void update(float milliseconds) {
     if (isMotionless()) {
-      for (FieldListener listener : listeners) {
-        listener.isMotionless();
-      }
+      listener.isMotionless();
       if (isEnd()) {
-        for (FieldListener listener : listeners) {
-          listener.gameOver();
-        }
+        listener.gameOver();
       }
       if (!cueBall.isAvailable()) {
         cueBall.setAvailable(true);
         cueBall.setPosition(sizeX / 4, sizeY / 2);
-        for (FieldListener listener : listeners) {
-          listener.fieldChanged();
-          listener.askForCueBall();
-        }
+        listener.fieldChanged();
+        listener.askForCueBall();
       }
       return;
     }
     move(milliseconds * 0.001f);
     updateVelocities();
     checkPockets();
-    for (FieldListener listener : listeners) {
-      listener.fieldChanged();
-    }
+    listener.fieldChanged();
   }
 
   public void increaseCueVelocity() {
@@ -189,9 +189,7 @@ public class Field {
       return false;
     }
     cue.strike(cueBall);
-    for (FieldListener listener : listeners) {
-      listener.strikePerformed();
-    }
+    listener.strikePerformed();
     return true;
   }
 
@@ -224,49 +222,39 @@ public class Field {
   }
   public void placeCueBall() {
     if (isFree(cueBall.getX(), cueBall.getY())) {
-      for (FieldListener listener : listeners) {
-        listener.cueBallPlaceSuccessful();
-      }
+      listener.cueBallPlaceSuccessful();
     }
   }
 
   public void moveCueBallLeft() {
-    if (cueBall.getX() - CUE_BALL_DELTA - ballRadius < 0) {
+    if (cueBall.getX() - CUE_BALL_PLACE_DELTA - ballRadius < 0) {
       return;
     }
-    cueBall.setPosition(cueBall.getX() - CUE_BALL_DELTA, cueBall.getY());
-    for (FieldListener listener : listeners) {
-      listener.fieldChanged();
-    }
+    cueBall.setPosition(cueBall.getX() - CUE_BALL_PLACE_DELTA, cueBall.getY());
+    listener.fieldChanged();
   }
 
   public void moveCueBallRight() {
-    if (cueBall.getX() + CUE_BALL_DELTA + ballRadius > sizeX / 4) {
+    if (cueBall.getX() + CUE_BALL_PLACE_DELTA + ballRadius > sizeX / 4) {
       return;
     }
-    cueBall.setPosition(cueBall.getX() + CUE_BALL_DELTA, cueBall.getY());
-    for (FieldListener listener : listeners) {
-      listener.fieldChanged();
-    }
+    cueBall.setPosition(cueBall.getX() + CUE_BALL_PLACE_DELTA, cueBall.getY());
+    listener.fieldChanged();
   }
 
   public void moveCueBallUp() {
-    if (cueBall.getY() - CUE_BALL_DELTA - ballRadius < 0) {
+    if (cueBall.getY() - CUE_BALL_PLACE_DELTA - ballRadius < 0) {
       return;
     }
-    cueBall.setPosition(cueBall.getX(), cueBall.getY() - CUE_BALL_DELTA);
-    for (FieldListener listener : listeners) {
-      listener.fieldChanged();
-    }
+    cueBall.setPosition(cueBall.getX(), cueBall.getY() - CUE_BALL_PLACE_DELTA);
+    listener.fieldChanged();
   }
 
   public void moveCueBallDown() {
-    if (cueBall.getY() + CUE_BALL_DELTA + ballRadius > sizeY) {
+    if (cueBall.getY() + CUE_BALL_PLACE_DELTA + ballRadius > sizeY) {
       return;
     }
-    cueBall.setPosition(cueBall.getX(), cueBall.getY() + CUE_BALL_DELTA);
-    for (FieldListener listener : listeners) {
-      listener.fieldChanged();
-    }
+    cueBall.setPosition(cueBall.getX(), cueBall.getY() + CUE_BALL_PLACE_DELTA);
+    listener.fieldChanged();
   }
 }

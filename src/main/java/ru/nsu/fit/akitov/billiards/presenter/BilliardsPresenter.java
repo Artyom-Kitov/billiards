@@ -1,10 +1,11 @@
 package ru.nsu.fit.akitov.billiards.presenter;
 
+import ru.nsu.fit.akitov.billiards.dto.BallModel;
 import ru.nsu.fit.akitov.billiards.model.Field;
 import ru.nsu.fit.akitov.billiards.model.FieldListener;
 import ru.nsu.fit.akitov.billiards.utils.Highscore;
 import ru.nsu.fit.akitov.billiards.utils.HighscoresTable;
-import ru.nsu.fit.akitov.billiards.utils.PocketModel;
+import ru.nsu.fit.akitov.billiards.dto.PocketModel;
 import ru.nsu.fit.akitov.billiards.view.BilliardsView;
 import ru.nsu.fit.akitov.billiards.view.ViewListener;
 
@@ -35,31 +36,33 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
       field.tickClock();
       view.updateTime(field.getElapsedTime());
     });
-
-    newGame();
   }
 
   @Override
   public void newGame() {
     field.reset();
-    view.clear();
     gameClock.restart();
 
-    view.resetBalls(field.getBalls());
+    view.updateCueBall(field.getCueBall());
+    view.updateBalls(field.getBalls());
     view.setCueAvailable(true);
+    view.clear();
   }
 
   @Override
   public void run() {
-    // CR: additional listener
-    view.attachListener(this);
-    field.addListener(this);
+    view.setListener(this);
+    field.setListener(this);
     field.reset();
     for (PocketModel pocket : field.getPockets()) {
       view.addPocket(pocket);
     }
-    // CR: also add balls here
+    view.setCueBall(field.getCueBall());
+    for (BallModel ball : field.getBalls()) {
+      view.addBall(ball);
+    }
     view.start();
+    newGame();
   }
 
   @Override
@@ -122,12 +125,13 @@ public class BilliardsPresenter implements Runnable, FieldListener, ViewListener
   public void playerNameEnter(String name) {
     int elapsed = field.getElapsedTime().minutes() * 60 + field.getElapsedTime().seconds();
     Highscore highscore = new Highscore(name, field.getBalls().size(), elapsed);
-    HighscoresTable.addHighscore(highscore);
+    HighscoresTable.INSTANCE.addHighscore(highscore);
     newGame();
   }
 
   @Override
   public void fieldChanged() {
+    view.updateCueBall(field.getCueBall());
     view.updateBalls(field.getBalls());
   }
 

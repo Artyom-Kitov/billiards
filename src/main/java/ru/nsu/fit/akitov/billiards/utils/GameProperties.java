@@ -2,15 +2,15 @@ package ru.nsu.fit.akitov.billiards.utils;
 
 import lombok.AccessLevel;
 import lombok.Builder;
+import ru.nsu.fit.akitov.billiards.model.ModelProperties;
+import ru.nsu.fit.akitov.billiards.view.ViewProperties;
 
 import java.io.*;
 import java.util.*;
 
 @Builder(builderClassName = "PropertiesBuilder", setterPrefix = "set", access = AccessLevel.PUBLIC)
 public record GameProperties(int fieldSize, float relativeBallSize,
-                             // CR: move to properties maybe?
-                             int relativePocketSize,
-                             int relativeCueStrength, List<Point2D> ballsCoordinates,
+                             int relativePocketSize, int relativeCueStrength, List<Point2D> ballsCoordinates,
 
                              int upperPanelSize, float relativeBorderSize,
                              String gameName, String menuOption, String newGameOption, String highscoresOption,

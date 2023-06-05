@@ -1,11 +1,15 @@
 package ru.nsu.fit.akitov.billiards.view;
 
+import ru.nsu.fit.akitov.billiards.dto.BallModel;
+import ru.nsu.fit.akitov.billiards.dto.CueModel;
+import ru.nsu.fit.akitov.billiards.dto.PocketModel;
 import ru.nsu.fit.akitov.billiards.utils.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class BilliardsFrame extends JFrame implements BilliardsView, NameEnterObserver {
@@ -24,9 +28,10 @@ public class BilliardsFrame extends JFrame implements BilliardsView, NameEnterOb
   private final AboutFrame aboutFrame;
   private final NameEnteringFrame nameEnteringFrame;
 
+  private boolean started = false;
+
   private ViewListener listener;
 
-  // CR: check if adds only once
   private final KeyAdapter cueController = new KeyAdapter() {
     @Override
     public void keyPressed(KeyEvent event) {
@@ -53,21 +58,30 @@ public class BilliardsFrame extends JFrame implements BilliardsView, NameEnterOb
     }
   };
 
+  @Override
+  public synchronized void addKeyListener(KeyListener l) {
+    if (Arrays.asList(getKeyListeners()).contains(l)) {
+      return;
+    }
+    super.addKeyListener(l);
+  }
+
   public BilliardsFrame(GameProperties properties) {
     super(properties.gameName());
+
+    clockView = new ClockView(properties.upperPanelSize());
 
     int borderSize = (int) (properties.fieldSize() * properties.relativeBorderSize());
     int width = 2 * properties.fieldSize() + 2 * borderSize;
     int height = properties.fieldSize() + 2 * borderSize;
     int ballRadius = (int) (properties.fieldSize() * properties.relativeBallSize());
+    this.setPreferredSize(new Dimension(width, 37 + height + menuBarSize + clockView.getHeight()));
 
     fieldView = new FieldView(width, height, ballRadius, "/field.png");
     fieldView.setBorderSize(borderSize);
-    clockView = new ClockView(properties.upperPanelSize());
     this.add(fieldView);
     this.add(clockView);
 
-    this.setPreferredSize(new Dimension(width, height + 2 * menuBarSize + 3 + clockView.getHeight()));
     this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     this.setVisible(true);
     this.setResizable(false);
@@ -82,7 +96,7 @@ public class BilliardsFrame extends JFrame implements BilliardsView, NameEnterOb
     highscoresFrame = new HighscoresFrame();
     aboutFrame = new AboutFrame();
     nameEnteringFrame = new NameEnteringFrame();
-    nameEnteringFrame.addObserver(this);
+    nameEnteringFrame.setObserver(this);
 
     SpringLayout layout = new SpringLayout();
     layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, clockView, 0, SpringLayout.HORIZONTAL_CENTER, getContentPane());
@@ -122,18 +136,18 @@ public class BilliardsFrame extends JFrame implements BilliardsView, NameEnterOb
 
   @Override
   public void start() {
+    started = true;
     addKeyListener(cueController);
     repaint();
   }
 
   @Override
   public void clear() {
-    fieldView.clear();
     clockView.setTime(new ClockTime(0, 0));
   }
 
   @Override
-  public void attachListener(ViewListener listener) {
+  public void setListener(ViewListener listener) {
     this.listener = listener;
   }
 
@@ -143,14 +157,29 @@ public class BilliardsFrame extends JFrame implements BilliardsView, NameEnterOb
   }
 
   @Override
-  public void updateBalls(List<BallModel> balls) {
-    fieldView.updateBalls(balls);
+  public void addBall(BallModel ball) {
+    BallView ballView = new BallView(ball.radius(), Color.white);
+    ballView.setLocation((int) ball.position().x(), (int) ball.position().y());
+    fieldView.addBall(ballView);
+  }
+
+  @Override
+  public void setCueBall(BallModel cueBall) {
+    BallView ballView = new BallView(cueBall.radius(), Color.darkGray);
+    ballView.setLocation((int) cueBall.position().x(), (int) cueBall.position().y());
+    fieldView.setCueBall(ballView);
+  }
+
+  @Override
+  public void updateCueBall(BallModel cueBall) {
+    fieldView.updateCueBall(cueBall);
     repaint();
   }
 
   @Override
-  public void resetBalls(List<BallModel> balls) {
-    fieldView.resetBalls(balls);
+  public void updateBalls(List<BallModel> balls) {
+    fieldView.updateBalls(balls);
+    repaint();
   }
 
   @Override
@@ -201,5 +230,13 @@ public class BilliardsFrame extends JFrame implements BilliardsView, NameEnterOb
   public void nameEntered(String name) {
     listener.playerNameEnter(name);
     nameEnteringFrame.setVisible(false);
+  }
+
+  @Override
+  public void paint(Graphics g) {
+    if (!started) {
+      return;
+    }
+    super.paint(g);
   }
 }
