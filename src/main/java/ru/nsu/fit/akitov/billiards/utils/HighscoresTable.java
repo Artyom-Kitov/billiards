@@ -29,17 +29,17 @@ public class HighscoresTable {
       HIGHSCORES.clear();
       HIGHSCORES.addAll(highscores);
     } catch (IndexOutOfBoundsException | IOException | NumberFormatException e) {
-      // CR: log
+      BilliardsLogger.INSTANCE.error("Couldn't read highscores from the file");
     }
   }
 
-  public void writeToConfig() {
+  private void writeToConfig() {
     try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(HighscoresTable.class.getResource("/highscores").toURI()))) {
       for (Highscore highscore : HIGHSCORES) {
         writer.write(highscore.toString() + "\n");
       }
     } catch (IOException | URISyntaxException e) {
-      // CR: log
+      BilliardsLogger.INSTANCE.error("Couldn't write highscores to the file");
     }
   }
 
