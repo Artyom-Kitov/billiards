@@ -1,23 +1,14 @@
 package ru.nsu.fit.akitov.billiards.utils;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public class BilliardsLogger {
 
-  public static final BilliardsLogger INSTANCE = new BilliardsLogger();
-
-  private final Logger logger;
-
   private BilliardsLogger() {
-    logger = LogManager.getLogger("ru.nsu.fit.akitov.billiards.utils.BilliardsLogger");
   }
 
-  public synchronized void error(String msg) {
-    logger.error(msg);
-  }
-
-  public synchronized void warn(String msg) {
-    logger.warn(msg);
+  public static void error(String msg) {
+    log.error(msg);
   }
 }

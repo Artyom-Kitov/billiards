@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class CueView extends JComponent {
+
   private static final float VELOCITY_DISPLAY_COEFFICIENT = 0.02f;
   private final Image body;
   private final int cueBallRadius;

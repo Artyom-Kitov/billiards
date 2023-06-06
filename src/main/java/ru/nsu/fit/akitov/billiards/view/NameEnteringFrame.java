@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class NameEnteringFrame extends JFrame {
+
   private static final int WIDTH = 512;
   private static final int HEIGHT = 150;
 

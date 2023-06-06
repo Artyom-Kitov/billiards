@@ -10,6 +10,9 @@ import java.util.Objects;
 
 public class AboutFrame extends JFrame {
 
+  private static final int WIDTH = 512;
+  private static final int HEIGHT = 480;
+
   private final Image background;
   private final List<String> lines;
 
@@ -27,7 +30,7 @@ public class AboutFrame extends JFrame {
     }
     this.lines = lines;
 
-    this.setPreferredSize(new Dimension(512, 480));
+    this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
     this.setLayout(null);
     this.setResizable(false);
     this.pack();

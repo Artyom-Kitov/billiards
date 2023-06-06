@@ -47,7 +47,7 @@ public record GameProperties(int fieldSize, float relativeBallSize,
       }
       return result;
     } catch (NoSuchElementException | IOException e) {
-      BilliardsLogger.INSTANCE.error("Error while reading balls positions");
+      BilliardsLogger.error("Error while reading balls positions");
       return List.of(new Point2D(14, 14));
     }
   }
@@ -77,7 +77,7 @@ public record GameProperties(int fieldSize, float relativeBallSize,
               .setExitOption(properties.getProperty("ExitOption"));
       return builder.build();
     } catch (IOException | NumberFormatException e) {
-      BilliardsLogger.INSTANCE.error("Error while reading game configuration, using default instead");
+      BilliardsLogger.error("Error while reading game configuration, using default instead");
       return builder.build();
     }
   }

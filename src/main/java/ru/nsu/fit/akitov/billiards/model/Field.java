@@ -66,7 +66,9 @@ public class Field {
 
   public void reset() {
     clock.reset();
-    for (int i = 0; i < startCoordinates.size(); i++) {
+    Point2D cueBallPosition = startCoordinates.get(0);
+    cueBall.setPosition(cueBallPosition.x() * ballRadius, cueBallPosition.y() * ballRadius);
+    for (int i = 1; i < startCoordinates.size(); i++) {
       Point2D position = startCoordinates.get(i);
       balls.get(i).setPosition(position.x() * ballRadius, position.y() * ballRadius);
       balls.get(i).setVelocity(0, 0);
@@ -120,7 +122,6 @@ public class Field {
           continue;
         }
         balls.get(i).hit(balls.get(j));
-        balls.get(i).unhookFrom(balls.get(j));
       }
     }
   }

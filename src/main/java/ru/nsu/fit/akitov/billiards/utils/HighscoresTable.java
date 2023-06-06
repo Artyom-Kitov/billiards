@@ -29,7 +29,7 @@ public class HighscoresTable {
       HIGHSCORES.clear();
       HIGHSCORES.addAll(highscores);
     } catch (IndexOutOfBoundsException | IOException | NumberFormatException e) {
-      BilliardsLogger.INSTANCE.error("Couldn't read highscores from the file");
+      BilliardsLogger.error("Couldn't read highscores from the file");
     }
   }
 
@@ -39,7 +39,7 @@ public class HighscoresTable {
         writer.write(highscore.toString() + "\n");
       }
     } catch (IOException | URISyntaxException e) {
-      BilliardsLogger.INSTANCE.error("Couldn't write highscores to the file");
+      BilliardsLogger.error("Couldn't write highscores to the file");
     }
   }
 

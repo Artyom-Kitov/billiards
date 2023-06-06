@@ -77,9 +77,6 @@ public class FieldView extends JPanel {
   }
 
   public void moveCue() {
-    if (balls.size() < 1) {
-      return;
-    }
     cueView.setPosition(cueBall.getX(), cueBall.getY());
   }
 
