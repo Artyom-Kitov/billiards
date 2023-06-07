@@ -113,10 +113,10 @@ public class Ball {
     other.vx = (other.vx - otherCentralProjectionX + thisCentralProjectionX);
     other.vy = (other.vy - otherCentralProjectionY + thisCentralProjectionY);
 
-    unhookFrom(other);
+    unhookFromBall(other);
   }
 
-  public void unhookFrom(Ball other) {
+  public void unhookFromBall(Ball other) {
     if (!isAvailable()) {
       return;
     }

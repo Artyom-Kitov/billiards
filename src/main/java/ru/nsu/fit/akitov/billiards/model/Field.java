@@ -14,7 +14,7 @@ public class Field {
   private static final float GRAVITY = 10;
 
   private static final float DELTA_VELOCITY = 50f;
-  private static final float DELTA_ANGLE = (float) Math.PI / 180f;
+  static final float DELTA_ANGLE = (float) Math.PI / 180f;
 
   private static final float CUE_BALL_PLACE_DELTA = 4;
 
@@ -153,7 +153,7 @@ public class Field {
       }
       if (!cueBall.isAvailable()) {
         cueBall.setAvailable(true);
-        cueBall.setPosition(sizeX / 4, sizeY / 2);
+        cueBall.setPosition(sizeX / 4 - ballRadius, sizeY / 2);
         listener.fieldChanged();
         listener.askForCueBall();
       }

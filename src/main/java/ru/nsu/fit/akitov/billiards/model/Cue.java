@@ -11,12 +11,10 @@ public class Cue {
   }
 
   public void addVelocity(float dv) {
-    velocity += dv;
-    if (velocity < 0.0f) {
-      velocity = 0.0f;
-    } else if (velocity > maxVelocity) {
-      velocity = maxVelocity;
+    if (velocity + dv < 0.0f || velocity + dv > maxVelocity) {
+      return;
     }
+    velocity += dv;
   }
 
   public void rotate(float theta) {

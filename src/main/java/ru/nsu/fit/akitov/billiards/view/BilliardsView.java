@@ -22,5 +22,4 @@ public interface BilliardsView {
   void startPlacingCueBall();
   void stopPlacingCueBall();
   void startEnteringName();
-
 }
