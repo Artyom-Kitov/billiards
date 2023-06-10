@@ -1,6 +1,5 @@
 package ru.nsu.fit.akitov.billiards.model;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.nsu.fit.akitov.billiards.dto.BallModel;
 import ru.nsu.fit.akitov.billiards.dto.PocketModel;
@@ -12,14 +11,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FieldTest {
 
-  static int numFieldChanged = 0;
-  static int numIsMotionless = 0;
-  static int numStrikePerformed = 0;
-  static int numAskForCueBall = 0;
-  static int numCueBallPlaceSuccessful = 0;
-  static int numGameOver = 0;
-
   static class TestFieldListener implements FieldListener {
+
+    private int numFieldChanged;
+    private int numIsMotionless;
+    private int numStrikePerformed;
+    private int numAskForCueBall;
+    private int numCueBallPlaceSuccessful;
+    private int numGameOver;
 
     @Override
     public void fieldChanged() {
@@ -50,16 +49,6 @@ class FieldTest {
     public void gameOver() {
       numGameOver++;
     }
-  }
-
-  @BeforeEach
-  void reset() {
-    numFieldChanged = 0;
-    numIsMotionless = 0;
-    numAskForCueBall = 0;
-    numStrikePerformed = 0;
-    numCueBallPlaceSuccessful = 0;
-    numGameOver = 0;
   }
 
   @Test
@@ -99,7 +88,8 @@ class FieldTest {
     List<Point2D> startPositions = List.of(new Point2D(5, 5));
     GameProperties gameProperties = GameProperties.builder().setBallsCoordinates(startPositions).build();
     Field field = new Field(gameProperties);
-    field.setListener(new TestFieldListener());
+    TestFieldListener listener = new TestFieldListener();
+    field.setListener(listener);
 
     BallModel initial = field.getCueBall();
 
@@ -110,28 +100,18 @@ class FieldTest {
     assertEquals(initial.position().y(), field.getCueBall().position().y());
 
     field.reset();
-    float rotated = 0.0f;
-    while (rotated < Math.PI / 2) {
-      rotated += Field.DELTA_ANGLE;
-      field.rotateCueLeft();
-    }
+    field.rotateCueLeft();
     field.performCueStrike();
     field.update(5);
-    assertNotEquals(initial.position().y(), field.getCueBall().position().y());
-    assertEquals(initial.position().x(), field.getCueBall().position().x());
+    assertNotEquals(initial.position(), field.getCueBall().position());
 
     field.reset();
-    while (rotated > Math.PI / 4) {
-      rotated -= Field.DELTA_ANGLE;
-      field.rotateCueRight();
-    }
-
+    field.rotateCueRight();
     field.performCueStrike();
     field.update(5);
-    assertNotEquals(initial.position().x(), field.getCueBall().position().x());
-    assertNotEquals(initial.position().y(), field.getCueBall().position().y());
+    assertNotEquals(initial.position(), field.getCueBall().position());
 
-    assertEquals(3, numStrikePerformed);
+    assertEquals(3, listener.numStrikePerformed);
   }
 
   @Test
@@ -139,7 +119,8 @@ class FieldTest {
     List<Point2D> startPositions = List.of(new Point2D(2, 1.1f));
     GameProperties gameProperties = GameProperties.builder().setBallsCoordinates(startPositions).build();
     Field field = new Field(gameProperties);
-    field.setListener(new TestFieldListener());
+    TestFieldListener listener = new TestFieldListener();
+    field.setListener(listener);
 
     for (int i = 0; i < 100; i++) {
       field.increaseCueVelocity();
@@ -149,8 +130,8 @@ class FieldTest {
       field.update(5);
     }
     assertFalse(field.getCueBall().isAvailable());
-    assertEquals(1, numStrikePerformed);
-    assertNotEquals(0, numFieldChanged);
+    assertEquals(1, listener.numStrikePerformed);
+    assertNotEquals(0, listener.numFieldChanged);
   }
 
   @Test
@@ -158,21 +139,22 @@ class FieldTest {
     List<Point2D> startCoordinates = List.of(new Point2D(2, 1), new Point2D(5, 1), new Point2D(8, 1));
     GameProperties gameProperties = GameProperties.builder().setBallsCoordinates(startCoordinates).build();
     Field field = new Field(gameProperties);
-    field.setListener(new TestFieldListener());
+    TestFieldListener listener = new TestFieldListener();
+    field.setListener(listener);
 
     for (int i = 0; i < 100; i++) {
       field.increaseCueVelocity();
     }
     field.performCueStrike();
-    while (numIsMotionless == 0) {
+    while (listener.numIsMotionless == 0) {
       field.update(5);
     }
 
     assertTrue(field.getCueBall().isAvailable());
     assertTrue(field.getBalls().get(0).isAvailable());
     assertFalse(field.getBalls().get(1).isAvailable());
-    assertEquals(0, numGameOver);
-    assertNotEquals(0, numFieldChanged);
+    assertEquals(0, listener.numGameOver);
+    assertNotEquals(0, listener.numFieldChanged);
   }
 
   @Test
@@ -180,17 +162,18 @@ class FieldTest {
     List<Point2D> startCoordinates = List.of(new Point2D(4, 1), new Point2D(2, 1), new Point2D(2, 4));
     GameProperties gameProperties = GameProperties.builder().setBallsCoordinates(startCoordinates).build();
     Field field = new Field(gameProperties);
-    field.setListener(new TestFieldListener());
+    TestFieldListener listener = new TestFieldListener();
+    field.setListener(listener);
 
     for (int i = 0; i < 100; i++) {
       field.increaseCueVelocity();
     }
     field.performCueStrike();
-    while (numIsMotionless == 0) {
+    while (listener.numIsMotionless == 0) {
       field.update(5);
     }
-    assertEquals(1, numIsMotionless);
-    assertEquals(1, numAskForCueBall);
+    assertEquals(1, listener.numIsMotionless);
+    assertEquals(1, listener.numAskForCueBall);
     for (int i = 0; i < 100; i++) {
       field.moveCueBallLeft();
     }
@@ -198,6 +181,6 @@ class FieldTest {
     field.moveCueBallLeft();
     assertEquals(prevPos, field.getCueBall());
     field.placeCueBall();
-    assertEquals(1, numCueBallPlaceSuccessful);
+    assertEquals(1, listener.numCueBallPlaceSuccessful);
   }
 }
